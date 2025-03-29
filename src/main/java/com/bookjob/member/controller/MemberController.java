@@ -21,7 +21,6 @@ public class MemberController {
     @PostMapping("/signup")
     public ResponseEntity<CommonResponse<Void>> signup(@Valid @RequestBody MemberSignupRequest request) {
         memberFacade.saveMember(request);
-
         return ResponseEntity.ok(CommonResponse.success());
     }
 }
