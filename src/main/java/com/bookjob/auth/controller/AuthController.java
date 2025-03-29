@@ -1,8 +1,8 @@
-package com.bookjob.member.controller;
+package com.bookjob.auth.controller;
 
+import com.bookjob.auth.facade.AuthFacade;
 import com.bookjob.common.dto.CommonResponse;
-import com.bookjob.member.facade.MemberFacade;
-import com.bookjob.member.dto.MemberSignupRequest;
+import com.bookjob.email.dto.EmailRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -12,15 +12,16 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/api/v1/members")
+@RequestMapping("/api/v1/auth")
 @RequiredArgsConstructor
-public class MemberController {
+public class AuthController {
 
-    private final MemberFacade memberFacade;
+    private final AuthFacade authFacade;
 
-    @PostMapping("/signup")
-    public ResponseEntity<CommonResponse<Void>> signup(@Valid @RequestBody MemberSignupRequest request) {
-        memberFacade.saveMember(request);
+    @PostMapping("/emails")
+    public ResponseEntity<CommonResponse<String>> sendCodeToEmail(@Valid @RequestBody EmailRequest request) {
+        authFacade.sendCodeToEmail(request.email());
         return ResponseEntity.ok(CommonResponse.success());
     }
+
 }
