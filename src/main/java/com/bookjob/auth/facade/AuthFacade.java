@@ -13,7 +13,7 @@ public class AuthFacade {
     private final EmailService emailService;
 
     public void sendCodeToEmail(String email) {
-        authService.validateNotDuplicatedEmail(email);
+        authService.checkDuplicatedEmail(email);
         emailService.requestEmailVerification(email);
     }
 }

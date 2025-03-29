@@ -11,7 +11,7 @@ public class AuthService {
 
     private final MemberRepository memberRepository;
 
-    public void validateNotDuplicatedEmail(String email) {
+    public void checkDuplicatedEmail(String email) {
         if (memberRepository.existsByEmail(email)) {
             throw ConflictException.duplicatedEmail(email);
         }
