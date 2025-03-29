@@ -2,7 +2,10 @@ package com.bookjob.board.service;
 
 import com.bookjob.board.domain.Board;
 import com.bookjob.board.dto.BoardCreateRequest;
+import com.bookjob.board.dto.BoardUpdateRequest;
 import com.bookjob.board.repository.BoardRepository;
+import com.bookjob.common.exception.ForbiddenException;
+import com.bookjob.common.exception.NotFoundException;
 import com.bookjob.member.domain.Member;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -27,5 +30,17 @@ public class BoardWriteService {
                 .build();
 
         boardRepository.save(board);
+    }
+
+    public void updateBoard(BoardUpdateRequest request, Member member, Long boardId) {
+        Board board = boardRepository.findById(boardId).orElseThrow(
+                NotFoundException::boardNotFound
+        );
+
+        if (!board.getMemberId().equals(member.getId())) {
+            throw ForbiddenException.forbidden();
+        }
+
+        board.updateText(request.text());
     }
 }
