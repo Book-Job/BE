@@ -116,4 +116,46 @@ public class BoardWriteServiceTest {
                     .hasMessage(ForbiddenException.forbidden().getMessage());
         }
     }
+
+    @Nested
+    class deleteBoard {
+
+        @Test
+        void 게시글_삭제() {
+            // given
+            Long memberId = 1L;
+            Long boardId = 1L;
+            Member member = mock(Member.class);
+            Board mockBoard = mock(Board.class);
+
+            when(member.getId()).thenReturn(memberId);
+            when(mockBoard.getMemberId()).thenReturn(memberId);
+            when(boardRepository.findById(eq(boardId))).thenReturn(Optional.of(mockBoard));
+
+            // when
+            boardWriteService.deleteBoard(boardId, member);
+
+            // then
+            verify(mockBoard).delete();
+        }
+
+        @Test
+        void 게시글_삭제_시_작성자가_아니면_Forbidden_예외_반환() {
+            // given
+            Long memberId = 1L;
+            Long boardId = 1L;
+            Long wrongMemberId = 2L;
+            Member member = mock(Member.class);
+            Board mockBoard = mock(Board.class);
+
+            when(member.getId()).thenReturn(wrongMemberId);
+            when(mockBoard.getMemberId()).thenReturn(memberId);
+            when(boardRepository.findById(eq(boardId))).thenReturn(Optional.of(mockBoard));
+
+            // when
+            assertThatThrownBy(() -> boardWriteService.deleteBoard(boardId, member))
+                    .isInstanceOf(ForbiddenException.class)
+                    .hasMessage(ForbiddenException.forbidden().getMessage());
+        }
+    }
 }
