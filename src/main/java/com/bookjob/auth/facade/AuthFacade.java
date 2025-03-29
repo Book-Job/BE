@@ -3,7 +3,6 @@ package com.bookjob.auth.facade;
 import com.bookjob.auth.service.AuthService;
 import com.bookjob.email.dto.EmailVerificationRequest;
 import com.bookjob.email.service.EmailService;
-import jakarta.validation.constraints.NotBlank;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
@@ -29,5 +28,10 @@ public class AuthFacade {
 
     public void checkDuplicatedNickname(String nickname) {
         authService.checkDuplicatedNickname(nickname);
+    }
+
+    public void sendCodeToEmailForLoginId(String email) {
+        authService.doesEmailExist(email);
+        emailService.requestEmailVerification(email);
     }
 }

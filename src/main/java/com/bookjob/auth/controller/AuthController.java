@@ -30,16 +30,22 @@ public class AuthController {
     }
 
     @GetMapping("/check-id")
-    public ResponseEntity<?> checkDuplicatedLoginId (
+    public ResponseEntity<?> checkDuplicatedLoginId(
             @RequestParam(name = "loginId") @NotBlank(message = "아이디는 필수 입력값입니다.") String loginId) {
         authFacade.checkDuplicatedLoginId(loginId);
         return ResponseEntity.ok(CommonResponse.success());
     }
 
     @GetMapping("/check-nickname")
-    public ResponseEntity<?> checkDuplicatedNickname (
+    public ResponseEntity<?> checkDuplicatedNickname(
             @RequestParam(name = "nickname") @NotBlank(message = "닉네임은 필수 입력값입니다.") String nickname) {
         authFacade.checkDuplicatedNickname(nickname);
+        return ResponseEntity.ok(CommonResponse.success());
+    }
+
+    @PostMapping("/email-verification/id")
+    public ResponseEntity<?> sendCodeToEmailForLoginId(@Valid @RequestBody EmailRequest request) {
+        authFacade.sendCodeToEmailForLoginId(request.email());
         return ResponseEntity.ok(CommonResponse.success());
     }
 }
