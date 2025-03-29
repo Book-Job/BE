@@ -22,4 +22,10 @@ public class AuthService {
             throw ConflictException.duplicatedLoginId();
         }
     }
+
+    public void checkDuplicatedNickname(String nickname) {
+        if (memberRepository.existsByNickname(nickname)) {
+            throw ConflictException.duplicatedNickname();
+        }
+    }
 }
