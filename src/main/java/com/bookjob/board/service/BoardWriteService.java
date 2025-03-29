@@ -43,4 +43,16 @@ public class BoardWriteService {
 
         board.updateText(request.text());
     }
+
+    public void deleteBoard(Long boardId, Member member) {
+        Board board = boardRepository.findById(boardId).orElseThrow(
+                NotFoundException::boardNotFound
+        );
+
+        if (!board.getMemberId().equals(member.getId())) {
+            throw ForbiddenException.forbidden();
+        }
+
+        board.delete();
+    }
 }
