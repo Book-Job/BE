@@ -9,11 +9,11 @@ import java.time.format.DateTimeFormatter;
 public record CommonResponse<T>(String message, T data, String timestamp) {
 
     public static <T> CommonResponse<T> success() {
-        return new CommonResponse<>("성공", null, setCurrentTimestamp());
+        return new CommonResponse<>("success", null, setCurrentTimestamp());
     }
 
     public static <T> CommonResponse<T> success(T data) {
-        return new CommonResponse<>("성공", data, setCurrentTimestamp());
+        return new CommonResponse<>("success", data, setCurrentTimestamp());
     }
 
     public static <T> CommonResponse<T> failure(String message) {
