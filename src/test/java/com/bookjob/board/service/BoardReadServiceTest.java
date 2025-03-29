@@ -59,7 +59,7 @@ public class BoardReadServiceTest {
         }
 
         @Test
-        void should_return_boards_after_specific_cursor() {
+        void 커서가_있을_때_글_전체_조회() {
             // given
             Long cursor = 5L;
             int pageSize = 2;
@@ -86,7 +86,7 @@ public class BoardReadServiceTest {
         }
 
         @Test
-        void should_return_empty_response_when_no_more_boards() {
+        void 글이_존재하지_않을_때_빈_리스트_반환() {
             // given
             Long cursor = 2L;
             int pageSize = 10;
