@@ -1,16 +1,25 @@
 package com.bookjob.auth.config;
 
+import com.bookjob.auth.filter.JwtAuthFilter;
+import com.bookjob.auth.filter.JwtLoginFilter;
+import com.bookjob.auth.service.MemberDetailsService;
+import com.bookjob.auth.utils.JwtProvider;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.autoconfigure.security.servlet.PathRequest;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.AuthenticationProvider;
+import org.springframework.security.authentication.ProviderManager;
+import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
-import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 import org.springframework.security.web.util.matcher.OrRequestMatcher;
 import org.springframework.security.web.util.matcher.RequestMatcher;
@@ -22,17 +31,32 @@ import java.util.Arrays;
 import java.util.List;
 
 @Configuration
-@EnableWebSecurity
 @EnableMethodSecurity(securedEnabled = true)
 @RequiredArgsConstructor
 public class SecurityConfig {
+    private final JwtProvider jwtProvider;
+    private final PasswordEncoder passwordEncoder;
+    private final MemberDetailsService memberDetailsService;
+
+    @Bean
+    public AuthenticationManager authenticationManager() {
+        return new ProviderManager(memberProvider());
+    }
+
+    @Bean
+    public AuthenticationProvider memberProvider() {
+        DaoAuthenticationProvider provider = new DaoAuthenticationProvider(passwordEncoder);
+        provider.setUserDetailsService(memberDetailsService);
+        return provider;
+    }
+
     @Bean
     CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
         configuration.setAllowedHeaders(List.of("*"));
         configuration.setAllowedOrigins(List.of("http://localhost:5173", "http://localhost:8080"));
         configuration.setAllowCredentials(true);
-        configuration.setAllowedMethods(Arrays.asList("GET","POST","PUT", "PATCH", "DELETE","OPTIONS"));
+        configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"));
         configuration.setMaxAge(60L);
         configuration.addExposedHeader("Authorization");
 
@@ -65,6 +89,9 @@ public class SecurityConfig {
 
         // 로그인 폼 비활성화
         http.formLogin(AbstractHttpConfigurer::disable);
+
+        http.addFilterBefore(new JwtLoginFilter(jwtProvider, authenticationManager(), "/api/v1/auth/login"), UsernamePasswordAuthenticationFilter.class)
+                .addFilterAfter(new JwtAuthFilter(memberDetailsService, jwtProvider), JwtLoginFilter.class);
 
         return http.build();
     }
