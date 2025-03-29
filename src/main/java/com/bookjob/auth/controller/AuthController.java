@@ -19,7 +19,7 @@ public class AuthController {
     private final AuthFacade authFacade;
 
     @PostMapping("/emails")
-    public ResponseEntity<CommonResponse<String>> sendMessage(@Valid @RequestBody EmailRequest request) {
+    public ResponseEntity<CommonResponse<String>> sendCodeToEmail(@Valid @RequestBody EmailRequest request) {
         authFacade.sendCodeToEmail(request.email());
         return ResponseEntity.ok(CommonResponse.success());
     }
