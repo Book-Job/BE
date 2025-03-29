@@ -31,4 +31,8 @@ public class BoardFacade {
         Member activeMember = memberReadService.getActiveMemberById(member.getId());
         boardWriteService.updateBoard(request, activeMember, boardId);
     }
+
+    public void deleteBoard(Long boardId, Member member) {
+        boardWriteService.deleteBoard(boardId, member);
+    }
 }

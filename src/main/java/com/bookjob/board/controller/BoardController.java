@@ -43,4 +43,12 @@ public class BoardController {
 
         return ResponseEntity.ok(CommonResponse.success());
     }
+
+    @DeleteMapping("/{boardId}")
+    public ResponseEntity<?> deleteBoard(@PathVariable Long boardId,
+                                         @AuthenticationPrincipal(expression = "member") Member member) {
+        boardFacade.deleteBoard(boardId, member);
+
+        return ResponseEntity.ok(CommonResponse.success());
+    }
 }
