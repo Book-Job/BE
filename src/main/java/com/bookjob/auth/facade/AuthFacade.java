@@ -21,4 +21,8 @@ public class AuthFacade {
     public void verifyCode(EmailVerificationRequest request) {
         emailService.verifyCode(request);
     }
+
+    public void checkDuplicatedLoginId(String loginId) {
+        authService.checkDuplicatedLoginId(loginId);
+    }
 }

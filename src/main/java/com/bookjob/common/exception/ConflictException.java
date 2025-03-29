@@ -4,6 +4,7 @@ import org.springframework.http.HttpStatus;
 
 public class ConflictException extends BaseException {
     static private final String DUPLICATED_EMAIL = "이미 가입된 회원입니다. 이메일: %s";
+    static private final String DUPLICATED_LOGINID = "중복된 아이디입니다.";
 
     public ConflictException(String message) {
         super(message, HttpStatus.CONFLICT);
@@ -14,4 +15,8 @@ public class ConflictException extends BaseException {
         return new InternalServerError(formattedMessage);
     }
 
+    public static InternalServerError duplicatedLoginId() {
+        String formattedMessage = String.format(DUPLICATED_LOGINID);
+        return new InternalServerError(formattedMessage);
+    }
 }

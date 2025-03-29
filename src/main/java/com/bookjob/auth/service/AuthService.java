@@ -16,4 +16,10 @@ public class AuthService {
             throw ConflictException.duplicatedEmail(email);
         }
     }
+
+    public void checkDuplicatedLoginId(String loginId) {
+        if (memberRepository.existsByLoginId(loginId)) {
+            throw ConflictException.duplicatedLoginId();
+        }
+    }
 }
