@@ -28,8 +28,8 @@ public class BoardController {
     }
 
     @GetMapping
-    public ResponseEntity<?> getBoardsAfterCursor(@RequestParam(required = false) Long cursor) {
-        CursorBoardResponse response = boardFacade.getBoardsAfterCursor(cursor, pageSize);
+    public ResponseEntity<?> getBoardsAfterCursor(@RequestParam(required = false) Long last) {
+        CursorBoardResponse response = boardFacade.getBoardsAfterCursor(last, pageSize);
 
         return ResponseEntity.ok(CommonResponse.success(response));
     }
