@@ -10,12 +10,12 @@ public class BadRequestException extends BaseException {
         super(message, HttpStatus.BAD_REQUEST);
     }
 
-    public static InternalServerError verificationCodeExpired() {
-        return new InternalServerError(VERIFICATION_CODE_EXPIRED);
+    public static BadRequestException verificationCodeExpired() {
+        return new BadRequestException(VERIFICATION_CODE_EXPIRED);
     }
 
-    public static InternalServerError invalidVerificationCode() {
-        return new InternalServerError(INVALID_VERIFICATION_CODE);
+    public static BadRequestException invalidVerificationCode() {
+        return new BadRequestException(INVALID_VERIFICATION_CODE);
     }
 
 }
