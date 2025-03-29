@@ -51,6 +51,6 @@ public class GlobalExceptionHandler {
     private static ResponseEntity<CommonResponse<Void>> buildResponseEntity(HttpStatusCode statusCode, String message) {
         return ResponseEntity
                 .status(statusCode)
-                .body(CommonResponse.failure(statusCode, message));
+                .body(CommonResponse.failure(message));
     }
 }
