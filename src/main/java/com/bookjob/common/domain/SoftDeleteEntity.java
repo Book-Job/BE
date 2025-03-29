@@ -11,4 +11,8 @@ import java.time.LocalDateTime;
 public abstract class SoftDeleteEntity extends BaseEntity {
     @Column
     private LocalDateTime deletedAt;
+
+    public void delete() {
+        deletedAt = LocalDateTime.now();
+    }
 }
