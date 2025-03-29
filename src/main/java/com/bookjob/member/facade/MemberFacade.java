@@ -1,4 +1,4 @@
-package com.bookjob.member.MemberFacade;
+package com.bookjob.member.facade;
 
 import com.bookjob.member.dto.MemberSignupRequest;
 import com.bookjob.member.service.MemberWriteService;

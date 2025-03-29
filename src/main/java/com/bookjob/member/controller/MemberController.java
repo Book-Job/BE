@@ -1,7 +1,7 @@
 package com.bookjob.member.controller;
 
 import com.bookjob.common.dto.CommonResponse;
-import com.bookjob.member.MemberFacade.MemberFacade;
+import com.bookjob.member.facade.MemberFacade;
 import com.bookjob.member.dto.MemberSignupRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
