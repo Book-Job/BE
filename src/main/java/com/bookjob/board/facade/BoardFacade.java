@@ -1,6 +1,7 @@
 package com.bookjob.board.facade;
 
 import com.bookjob.board.dto.BoardCreateRequest;
+import com.bookjob.board.dto.BoardUpdateRequest;
 import com.bookjob.board.dto.CursorBoardResponse;
 import com.bookjob.board.service.BoardReadService;
 import com.bookjob.board.service.BoardWriteService;
@@ -24,5 +25,10 @@ public class BoardFacade {
 
     public CursorBoardResponse getBoardsAfterCursor(Long cursor, int pageSize) {
         return boardReadService.getBoardsAfterCursor(cursor, pageSize);
+    }
+
+    public void updateBoard(BoardUpdateRequest request, Member member, Long boardId) {
+        Member activeMember = memberReadService.getActiveMemberById(member.getId());
+        boardWriteService.updateBoard(request, activeMember, boardId);
     }
 }

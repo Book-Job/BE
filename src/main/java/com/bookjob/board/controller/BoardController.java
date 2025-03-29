@@ -1,6 +1,7 @@
 package com.bookjob.board.controller;
 
 import com.bookjob.board.dto.BoardCreateRequest;
+import com.bookjob.board.dto.BoardUpdateRequest;
 import com.bookjob.board.dto.CursorBoardResponse;
 import com.bookjob.board.facade.BoardFacade;
 import com.bookjob.common.dto.CommonResponse;
@@ -32,5 +33,14 @@ public class BoardController {
         CursorBoardResponse response = boardFacade.getBoardsAfterCursor(last, pageSize);
 
         return ResponseEntity.ok(CommonResponse.success(response));
+    }
+
+    @PatchMapping("/{boardId}")
+    public ResponseEntity<?> updateBoard(@RequestBody BoardUpdateRequest request,
+                                         @PathVariable Long boardId,
+                                         @AuthenticationPrincipal(expression = "member") Member member) {
+        boardFacade.updateBoard(request, member, boardId);
+
+        return ResponseEntity.ok(CommonResponse.success());
     }
 }
