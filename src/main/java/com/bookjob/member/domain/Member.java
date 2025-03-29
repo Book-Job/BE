@@ -1,17 +1,19 @@
 package com.bookjob.member.domain;
 
-import com.bookjob.common.domain.BaseEntity;
 import com.bookjob.common.domain.Password;
+import com.bookjob.common.domain.SoftDeleteEntity;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.SQLDelete;
 
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class Member extends BaseEntity {
+@SQLDelete(sql = "UPDATE member SET deleted_at = CURRENT_TIMESTAMP WHERE id = ?")
+public class Member extends SoftDeleteEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -38,19 +40,15 @@ public class Member extends BaseEntity {
     private MemberRole role;
 
     @Column(nullable = false)
-    private Boolean isDeleted;
-
-    @Column(nullable = false)
     private Boolean isBlocked;
 
     @Builder
-    public Member (String loginId, String nickname, String email, Password password) {
+    public Member(String loginId, String nickname, String email, Password password) {
         this.loginId = loginId;
         this.nickname = nickname;
         this.email = email;
         this.password = password;
         this.role = MemberRole.MEMBER;
-        this.isDeleted = false;
         this.isBlocked = false;
     }
 }
