@@ -3,6 +3,7 @@ package com.bookjob.auth.controller;
 import com.bookjob.auth.facade.AuthFacade;
 import com.bookjob.common.dto.CommonResponse;
 import com.bookjob.email.dto.EmailRequest;
+import com.bookjob.email.dto.EmailVerificationRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -24,4 +25,9 @@ public class AuthController {
         return ResponseEntity.ok(CommonResponse.success());
     }
 
+    @PostMapping("/emails/code")
+    public ResponseEntity<CommonResponse<Void>> verificationEmail(@Valid @RequestBody EmailVerificationRequest request) {
+        authFacade.verifyCode(request);
+        return ResponseEntity.ok(CommonResponse.success());
+    }
 }
