@@ -16,21 +16,26 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.stereotype.Component;
+import org.springframework.security.web.util.matcher.RequestMatcher;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
 
-@Component
 @RequiredArgsConstructor
 public class JwtAuthFilter extends OncePerRequestFilter {
     private final MemberDetailsService memberDetailsService;
     private final JwtProvider jwtProvider;
+    private final RequestMatcher ignoreRequestMatcher;
 
     @Override
     protected void doFilterInternal(@NonNull HttpServletRequest request, @NonNull HttpServletResponse response, @NonNull FilterChain filterChain)
             throws ServletException, IOException {
         String token = request.getHeader("Authorization");
+
+        if (ignoreRequestMatcher.matches(request)) {
+            filterChain.doFilter(request, response);
+            return;
+        }
 
         if (token != null && token.startsWith("Bearer ")) {
             try {

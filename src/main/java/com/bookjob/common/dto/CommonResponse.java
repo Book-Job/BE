@@ -3,10 +3,9 @@ package com.bookjob.common.dto;
 import com.fasterxml.jackson.annotation.JsonInclude;
 
 import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
-public record CommonResponse<T>(String message, T data, String timestamp) {
+public record CommonResponse<T>(String message, T data, LocalDateTime timestamp) {
 
     public static <T> CommonResponse<T> success() {
         return new CommonResponse<>("success", null, setCurrentTimestamp());
@@ -20,8 +19,8 @@ public record CommonResponse<T>(String message, T data, String timestamp) {
         return new CommonResponse<>(message, null, setCurrentTimestamp());
     }
 
-    private static String setCurrentTimestamp() {
-        return LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
+    private static LocalDateTime setCurrentTimestamp() {
+        return LocalDateTime.now();
     }
 }
 

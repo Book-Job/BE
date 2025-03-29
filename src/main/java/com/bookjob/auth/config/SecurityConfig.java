@@ -69,7 +69,8 @@ public class SecurityConfig {
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         // 필터링에서 제외할 요청들
         final RequestMatcher ignoredRequests = new OrRequestMatcher(
-                List.of(new AntPathRequestMatcher("/api/v1/members/signup", HttpMethod.POST.name())
+                List.of(new AntPathRequestMatcher("/api/v1/members/signup", HttpMethod.POST.name()),
+                        new AntPathRequestMatcher("/api/v1/boards", HttpMethod.GET.name())
                 ));
 
         // 요청별 권한 관리
@@ -91,7 +92,7 @@ public class SecurityConfig {
         http.formLogin(AbstractHttpConfigurer::disable);
 
         http.addFilterBefore(new JwtLoginFilter(jwtProvider, authenticationManager(), "/api/v1/auth/login"), UsernamePasswordAuthenticationFilter.class)
-                .addFilterAfter(new JwtAuthFilter(memberDetailsService, jwtProvider), JwtLoginFilter.class);
+                .addFilterAfter(new JwtAuthFilter(memberDetailsService, jwtProvider, ignoredRequests), JwtLoginFilter.class);
 
         return http.build();
     }
