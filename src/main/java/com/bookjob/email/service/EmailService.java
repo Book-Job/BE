@@ -92,18 +92,15 @@ public class EmailService {
     public void verifyCode(EmailVerificationRequest request) {
         String email = request.email();
         String code = request.code();
-        Optional<EmailVerification> verification = emailVerificationRepository.findByEmailAndCode(email, code);
 
-        if (verification.isEmpty()) {
-            throw BadRequestException.invalidVerificationCode();
-        }
+        EmailVerification verification = emailVerificationRepository
+                .findByEmailAndCode(email, code)
+                .orElseThrow(BadRequestException::invalidVerificationCode);
 
-        LocalDateTime now = LocalDateTime.now();
-        // 현재시간보다 만료시간이 뒤인 경우(만료시간 아직 안 지남), 인증 메일 지우고 완료 메시지 전송
-        if (verification.get().getExpirationTime().isAfter(now)) {
-            emailVerificationRepository.deleteByEmail(email);
-        } else {
+        if (verification.getExpirationTime().isBefore(LocalDateTime.now())) {
             throw BadRequestException.verificationCodeExpired();
         }
+
+        emailVerificationRepository.deleteByEmail(email);
     }
 }
