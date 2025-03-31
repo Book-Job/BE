@@ -1,8 +1,10 @@
 package com.bookjob.board.service;
 
-import com.bookjob.board.dto.BoardPreviewResponse;
-import com.bookjob.board.dto.CursorBoardResponse;
+import com.bookjob.board.dto.response.BoardDetailResponse;
+import com.bookjob.board.dto.response.BoardPreviewResponse;
+import com.bookjob.board.dto.response.CursorBoardResponse;
 import com.bookjob.board.repository.BoardRepository;
+import com.bookjob.common.exception.NotFoundException;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -13,8 +15,10 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 
 import java.util.List;
+import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.*;
@@ -104,6 +108,36 @@ public class BoardReadServiceTest {
             assertThat(response.lastBoardId()).isEqualTo(0L);
 
             verify(boardRepository).findBoardsBeforeCursor(eq(cursor), eq(pageable));
+        }
+    }
+
+    @Nested
+    class GetBoardDetails {
+
+        @Test
+        void 게시글_PK_로_상세_조회() {
+            // given
+            Long boardId = 1L;
+            BoardDetailResponse response = mock(BoardDetailResponse.class);
+            when(boardRepository.findBoardById(boardId)).thenReturn(Optional.of(response));
+
+            // when
+            BoardDetailResponse boardDetails = boardReadService.getBoardDetails(boardId);
+
+            // then
+            verify(boardRepository).findBoardById(boardId);
+            assertThat(boardDetails).isEqualTo(response);
+        }
+
+        @Test
+        void 글이_존재하지_않을_때_NOTFOUND_반환() {
+            // given
+            Long wrongBoardId = 1L;
+            when(boardRepository.findBoardById(1L)).thenReturn(Optional.empty());
+
+            // when & then
+            assertThatThrownBy(() -> boardReadService.getBoardDetails(wrongBoardId)).isInstanceOf(NotFoundException.class);
+            verify(boardRepository).findBoardById(1L);
         }
     }
 }
