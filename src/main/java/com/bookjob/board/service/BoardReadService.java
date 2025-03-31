@@ -1,8 +1,10 @@
 package com.bookjob.board.service;
 
-import com.bookjob.board.dto.BoardPreviewResponse;
-import com.bookjob.board.dto.CursorBoardResponse;
+import com.bookjob.board.dto.response.BoardDetailResponse;
+import com.bookjob.board.dto.response.BoardPreviewResponse;
+import com.bookjob.board.dto.response.CursorBoardResponse;
 import com.bookjob.board.repository.BoardRepository;
+import com.bookjob.common.exception.NotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -31,5 +33,11 @@ public class BoardReadService {
         Long lastBoardId = boards.getLast().boardId();
 
         return new CursorBoardResponse(boards, lastBoardId);
+    }
+
+    public BoardDetailResponse getBoardDetails(Long boardId) {
+        return boardRepository.findBoardById(boardId).orElseThrow(
+                NotFoundException::boardNotFound
+        );
     }
 }
