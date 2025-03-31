@@ -30,8 +30,8 @@ public class BoardController {
     }
 
     @GetMapping
-    public ResponseEntity<?> getBoardsAfterCursor(@RequestParam(required = false) Long last) {
-        CursorBoardResponse response = boardFacade.getBoardsAfterCursor(last, pageSize);
+    public ResponseEntity<?> getBoardsAfterCursorWithKeyword(@RequestParam(required = false) Long last, @RequestParam(required = false) String keyword) {
+        CursorBoardResponse response = boardFacade.getBoardsAfterCursorWithKeyword(keyword, last, pageSize);
 
         return ResponseEntity.ok(CommonResponse.success(response));
     }

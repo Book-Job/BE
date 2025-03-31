@@ -24,8 +24,8 @@ public class BoardFacade {
         boardWriteService.createBoard(request, activeMember);
     }
 
-    public CursorBoardResponse getBoardsAfterCursor(Long cursor, int pageSize) {
-        return boardReadService.getBoardsAfterCursor(cursor, pageSize);
+    public CursorBoardResponse getBoardsAfterCursorWithKeyword(String keyword, Long cursor, int pageSize) {
+        return boardReadService.getBoardsAfterCursorWithKeyword(keyword, cursor, pageSize);
     }
 
     public void updateBoard(BoardUpdateRequest request, Member member, Long boardId) {

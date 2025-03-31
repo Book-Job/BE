@@ -3,11 +3,10 @@ package com.bookjob.board.service;
 import com.bookjob.board.dto.response.BoardDetailResponse;
 import com.bookjob.board.dto.response.BoardPreviewResponse;
 import com.bookjob.board.dto.response.CursorBoardResponse;
+import com.bookjob.board.repository.BoardQueryRepository;
 import com.bookjob.board.repository.BoardRepository;
 import com.bookjob.common.exception.NotFoundException;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -19,12 +18,12 @@ import java.util.List;
 public class BoardReadService {
 
     private final BoardRepository boardRepository;
+    private final BoardQueryRepository boardQueryRepository;
 
-    public CursorBoardResponse getBoardsAfterCursor(Long cursor, int pageSize) {
-        Long cursorId = cursor != null ? cursor : Long.MAX_VALUE;
+    public CursorBoardResponse getBoardsAfterCursorWithKeyword(String keyword, Long cursor, int pageSize) {
+        Long cursorId = cursor != null ? cursor : java.lang.Long.MAX_VALUE;
 
-        Pageable pageable = PageRequest.of(0, pageSize);
-        List<BoardPreviewResponse> boards = boardRepository.findBoardsBeforeCursor(cursorId, pageable);
+        List<BoardPreviewResponse> boards = boardQueryRepository.getBoardListWithKeyword(keyword, cursorId, pageSize);
 
         if (boards.isEmpty()) {
             return new CursorBoardResponse(List.of(), 0L);
