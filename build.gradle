@@ -2,6 +2,7 @@ plugins {
     id 'java'
     id 'org.springframework.boot' version '3.4.4'
     id 'io.spring.dependency-management' version '1.1.7'
+    id 'nu.studer.jooq' version '9.0'
 }
 
 group = 'com'
@@ -26,14 +27,21 @@ repositories {
 dependencies {
 
     // Email
-    implementation("jakarta.mail:jakarta.mail-api:2.1.3")
-    implementation group: 'org.springframework.boot', name: 'spring-boot-starter-mail', version: '3.0.5'
+    implementation 'jakarta.mail:jakarta.mail-api:2.1.3'
+    implementation 'org.springframework.boot:spring-boot-starter-mail:3.0.5'
+
+    // Jooq
+    implementation 'org.jooq:jooq:3.19.21'
+    implementation 'org.jooq:jooq-meta:3.19.21'
+    implementation 'org.jooq:jooq-codegen:3.19.21'
+    jooqGenerator 'com.mysql:mysql-connector-j:8.4.0'
 
     // Starter
     implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
     implementation 'org.springframework.boot:spring-boot-starter-web'
     implementation 'org.springframework.boot:spring-boot-starter-security'
     implementation 'org.springframework.boot:spring-boot-starter-validation'
+    implementation 'org.springframework.boot:spring-boot-starter-jooq'
 
     // jwt
     implementation 'io.jsonwebtoken:jjwt-api:0.12.6'
@@ -41,7 +49,7 @@ dependencies {
     runtimeOnly 'io.jsonwebtoken:jjwt-jackson:0.12.6'
 
     // MySQL
-    runtimeOnly 'com.mysql:mysql-connector-j'
+    runtimeOnly 'com.mysql:mysql-connector-j:8.4.0'
 
     // Validation
     implementation 'jakarta.validation:jakarta.validation-api:3.1.1'
@@ -55,6 +63,54 @@ dependencies {
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 }
 
+jooq {
+    version = '3.19.21'
+    configurations {
+        main {
+            generationTool {
+                jdbc {
+                    driver = 'com.mysql.cj.jdbc.Driver'
+                    url = System.getenv('DB_URL') ?: 'jdbc:mysql://localhost:3306/bookjob'
+                    user = System.getenv('DB_USER') ?: 'root'
+                    password = System.getenv('DB_PASSWORD') ?: 'root1234'
+                }
+
+                generator {
+                    name = 'org.jooq.codegen.DefaultGenerator'
+                    database {
+                        name = 'org.jooq.meta.mysql.MySQLDatabase'
+                        inputSchema = 'bookjob'
+                        includes = '.*'
+                    }
+                    generate {
+                        deprecated = false
+                        records = true
+                        immutablePojos = true
+                        fluentSetters = true
+                    }
+                    target {
+                        packageName = 'com.bookjob.jooq.generated'
+                        directory = 'build/generated-src/jooq/main'
+                    }
+                    strategy.name = 'org.jooq.codegen.DefaultGeneratorStrategy'
+                }
+            }
+        }
+    }
+}
+
+sourceSets {
+    main {
+        java {
+            srcDirs "$buildDir/generated/jooq"
+        }
+    }
+}
+
 tasks.named('test') {
     useJUnitPlatform()
+}
+
+tasks.named('generateJooq').configure {
+    allInputsDeclared = true
 }
