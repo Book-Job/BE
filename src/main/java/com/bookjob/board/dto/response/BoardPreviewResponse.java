@@ -1,4 +1,4 @@
-package com.bookjob.board.dto;
+package com.bookjob.board.dto.response;
 
 import java.time.LocalDateTime;
 
