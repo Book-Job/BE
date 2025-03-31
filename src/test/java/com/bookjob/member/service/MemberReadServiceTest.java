@@ -1,6 +1,6 @@
 package com.bookjob.member.service;
 
-import com.bookjob.common.exception.BaseException;
+import com.bookjob.common.exception.UnAuthorizedException;
 import com.bookjob.member.domain.Member;
 import com.bookjob.member.repository.MemberRepository;
 import org.junit.jupiter.api.Nested;
@@ -14,6 +14,7 @@ import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -48,15 +49,13 @@ public class MemberReadServiceTest {
         @Test
         void 비활성_유저_조회_시_에러를_반환한다() {
             // given
-            Member deactivateMember = mock(Member.class);
-            when(deactivateMember.getIsBlocked()).thenReturn(Boolean.TRUE);
-            when(deactivateMember.getDeletedAt()).thenReturn(null);
-            when(memberRepository.findByIdAndIsBlockedFalseAndDeletedAtIsNull(1L)).thenReturn(Optional.of(deactivateMember));
+            when(memberRepository.findByIdAndIsBlockedFalseAndDeletedAtIsNull(eq(1L))).thenReturn(Optional.empty());
 
             // when
             assertThatThrownBy(
                     () -> memberReadService.getActiveMemberById(1L)
-            ).isInstanceOf(BaseException.class).hasMessage("활성화 되지 않은 유저입니다");
+            ).isInstanceOf(UnAuthorizedException.class)
+                    .hasMessage(UnAuthorizedException.deactivatedMemberUnauthorized().getMessage());
         }
     }
 }
