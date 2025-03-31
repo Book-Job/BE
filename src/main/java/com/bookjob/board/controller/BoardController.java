@@ -1,8 +1,9 @@
 package com.bookjob.board.controller;
 
-import com.bookjob.board.dto.BoardCreateRequest;
-import com.bookjob.board.dto.BoardUpdateRequest;
-import com.bookjob.board.dto.CursorBoardResponse;
+import com.bookjob.board.dto.request.BoardCreateRequest;
+import com.bookjob.board.dto.request.BoardUpdateRequest;
+import com.bookjob.board.dto.response.BoardDetailResponse;
+import com.bookjob.board.dto.response.CursorBoardResponse;
 import com.bookjob.board.facade.BoardFacade;
 import com.bookjob.common.dto.CommonResponse;
 import com.bookjob.member.domain.Member;
@@ -51,4 +52,12 @@ public class BoardController {
 
         return ResponseEntity.ok(CommonResponse.success());
     }
+
+    @GetMapping("/{boardId}")
+    public ResponseEntity<?> getBoard(@PathVariable Long boardId) {
+        BoardDetailResponse res = boardFacade.getBoardDetail(boardId);
+
+        return ResponseEntity.ok(CommonResponse.success(res));
+    }
+
 }

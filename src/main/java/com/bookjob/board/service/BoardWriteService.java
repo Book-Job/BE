@@ -1,8 +1,8 @@
 package com.bookjob.board.service;
 
 import com.bookjob.board.domain.Board;
-import com.bookjob.board.dto.BoardCreateRequest;
-import com.bookjob.board.dto.BoardUpdateRequest;
+import com.bookjob.board.dto.request.BoardCreateRequest;
+import com.bookjob.board.dto.request.BoardUpdateRequest;
 import com.bookjob.board.repository.BoardRepository;
 import com.bookjob.common.exception.ForbiddenException;
 import com.bookjob.common.exception.NotFoundException;

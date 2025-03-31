@@ -1,8 +1,9 @@
 package com.bookjob.board.facade;
 
-import com.bookjob.board.dto.BoardCreateRequest;
-import com.bookjob.board.dto.BoardUpdateRequest;
-import com.bookjob.board.dto.CursorBoardResponse;
+import com.bookjob.board.dto.request.BoardCreateRequest;
+import com.bookjob.board.dto.request.BoardUpdateRequest;
+import com.bookjob.board.dto.response.BoardDetailResponse;
+import com.bookjob.board.dto.response.CursorBoardResponse;
 import com.bookjob.board.service.BoardReadService;
 import com.bookjob.board.service.BoardWriteService;
 import com.bookjob.member.domain.Member;
@@ -34,5 +35,9 @@ public class BoardFacade {
 
     public void deleteBoard(Long boardId, Member member) {
         boardWriteService.deleteBoard(boardId, member);
+    }
+
+    public BoardDetailResponse getBoardDetail(Long boardId) {
+        return boardReadService.getBoardDetails(boardId);
     }
 }
