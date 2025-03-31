@@ -3,6 +3,7 @@ package com.bookjob.board.service;
 import com.bookjob.board.dto.response.BoardDetailResponse;
 import com.bookjob.board.dto.response.BoardPreviewResponse;
 import com.bookjob.board.dto.response.CursorBoardResponse;
+import com.bookjob.board.repository.BoardQueryRepository;
 import com.bookjob.board.repository.BoardRepository;
 import com.bookjob.common.exception.NotFoundException;
 import org.junit.jupiter.api.Nested;
@@ -11,8 +12,6 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
 
 import java.util.List;
 import java.util.Optional;
@@ -32,8 +31,11 @@ public class BoardReadServiceTest {
     @Mock
     private BoardRepository boardRepository;
 
+    @Mock
+    private BoardQueryRepository boardQueryRepository;
+
     @Nested
-    class GetBoardsAfterCursor {
+    class GetBoardsAfterCursorWithKeyword {
 
         @Test
         void 게시판_글_전체_조회_쿼리_파라메터_없음() {
@@ -45,13 +47,11 @@ public class BoardReadServiceTest {
 
             when(lastBoard.boardId()).thenReturn(1L);
 
-            Pageable pageable = PageRequest.of(0, pageSize);
-
             List<BoardPreviewResponse> boards = List.of(board1, board2, lastBoard);
-            when(boardRepository.findBoardsBeforeCursor(any(Long.class), eq(pageable))).thenReturn(boards);
+            when(boardQueryRepository.getBoardListWithKeyword(isNull(), any(Long.class), eq(pageSize))).thenReturn(boards);
 
             // when
-            CursorBoardResponse response = boardReadService.getBoardsAfterCursor(null, pageSize);
+            CursorBoardResponse response = boardReadService.getBoardsAfterCursorWithKeyword(null, null, pageSize);
 
             // then
             assertThat(response).isNotNull();
@@ -59,7 +59,7 @@ public class BoardReadServiceTest {
             assertThat(response.boards()).containsExactly(board1, board2, lastBoard);
             assertThat(response.lastBoardId()).isEqualTo(1L);
 
-            verify(boardRepository).findBoardsBeforeCursor(eq(Long.MAX_VALUE), eq(pageable));
+            verify(boardQueryRepository).getBoardListWithKeyword(isNull(), eq(Long.MAX_VALUE), eq(pageSize));
         }
 
         @Test
@@ -73,12 +73,11 @@ public class BoardReadServiceTest {
             when(board2.boardId()).thenReturn(3L);
 
             List<BoardPreviewResponse> boards = List.of(board1, board2);
-            Pageable pageable = PageRequest.of(0, pageSize);
 
-            when(boardRepository.findBoardsBeforeCursor(eq(cursor), eq(pageable))).thenReturn(boards);
+            when(boardQueryRepository.getBoardListWithKeyword(isNull(), eq(cursor), eq(pageSize))).thenReturn(boards);
 
             // when
-            CursorBoardResponse response = boardReadService.getBoardsAfterCursor(cursor, pageSize);
+            CursorBoardResponse response = boardReadService.getBoardsAfterCursorWithKeyword(null, cursor, pageSize);
 
             // then
             assertThat(response).isNotNull();
@@ -86,7 +85,7 @@ public class BoardReadServiceTest {
             assertThat(response.boards()).containsExactly(board1, board2);
             assertThat(response.lastBoardId()).isEqualTo(3L);
 
-            verify(boardRepository).findBoardsBeforeCursor(eq(cursor), eq(pageable));
+            verify(boardQueryRepository).getBoardListWithKeyword(isNull(), eq(cursor), eq(pageSize));
         }
 
         @Test
@@ -95,19 +94,18 @@ public class BoardReadServiceTest {
             Long cursor = 2L;
             int pageSize = 10;
             List<BoardPreviewResponse> emptyBoards = List.of();
-            Pageable pageable = PageRequest.of(0, pageSize);
 
-            when(boardRepository.findBoardsBeforeCursor(eq(cursor), eq(pageable))).thenReturn(emptyBoards);
+            when(boardQueryRepository.getBoardListWithKeyword(isNull(), eq(cursor), eq(pageSize))).thenReturn(emptyBoards);
 
             // when
-            CursorBoardResponse response = boardReadService.getBoardsAfterCursor(cursor, pageSize);
+            CursorBoardResponse response = boardReadService.getBoardsAfterCursorWithKeyword(null, cursor, pageSize);
 
             // then
             assertThat(response).isNotNull();
             assertThat(response.boards()).isEmpty();
             assertThat(response.lastBoardId()).isEqualTo(0L);
 
-            verify(boardRepository).findBoardsBeforeCursor(eq(cursor), eq(pageable));
+            verify(boardQueryRepository).getBoardListWithKeyword(isNull(), eq(cursor), eq(pageSize));
         }
     }
 
