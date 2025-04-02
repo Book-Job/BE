@@ -39,4 +39,8 @@ public class BoardReadService {
                 NotFoundException::boardNotFound
         );
     }
+
+    public boolean notExistsBoard(Long boardId) {
+        return !boardRepository.existsById(boardId);
+    }
 }

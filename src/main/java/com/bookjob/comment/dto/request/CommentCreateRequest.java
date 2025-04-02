@@ -1,6 +1,6 @@
 package com.bookjob.comment.dto.request;
 
-public record CommentRequest(
+public record CommentCreateRequest(
         String content,
         String nickname,
         String password

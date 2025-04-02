@@ -1,6 +1,7 @@
 package com.bookjob.comment.controller;
 
-import com.bookjob.comment.dto.request.CommentRequest;
+import com.bookjob.comment.dto.request.CommentCreateRequest;
+import com.bookjob.comment.dto.request.CommentUpdateRequest;
 import com.bookjob.comment.facade.CommentFacade;
 import com.bookjob.common.dto.CommonResponse;
 import com.bookjob.member.domain.Member;
@@ -17,10 +18,20 @@ public class CommentController {
     private final CommentFacade commentFacade;
 
     @PostMapping
-    public ResponseEntity<?> createComment(@RequestBody CommentRequest commentRequest,
+    public ResponseEntity<?> createComment(@RequestBody CommentCreateRequest commentCreateRequest,
                                            @PathVariable("boardId") Long boardId,
                                            @AuthenticationPrincipal(expression = "member") Member member) {
-        commentFacade.createComment(commentRequest, boardId, member);
+        commentFacade.createComment(commentCreateRequest, boardId, member);
+
+        return ResponseEntity.ok(CommonResponse.success());
+    }
+
+    @PatchMapping("{commentId}")
+    public ResponseEntity<?> updateComment(@RequestBody CommentUpdateRequest request,
+                                           @PathVariable("boardId") Long boardId,
+                                           @PathVariable("commentId") Long commentId,
+                                           @AuthenticationPrincipal(expression = "member") Member member) {
+        commentFacade.updateComment(request, boardId, commentId, member);
 
         return ResponseEntity.ok(CommonResponse.success());
     }
