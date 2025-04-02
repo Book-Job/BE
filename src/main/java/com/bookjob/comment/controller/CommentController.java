@@ -35,4 +35,14 @@ public class CommentController {
 
         return ResponseEntity.ok(CommonResponse.success());
     }
+
+
+    @DeleteMapping("{commentId}")
+    public ResponseEntity<?> deleteComment(@PathVariable("boardId") Long boardId,
+                                           @PathVariable("commentId") Long commentId,
+                                           @AuthenticationPrincipal(expression = "member") Member member) {
+        commentFacade.deleteComment(boardId, commentId, member);
+
+        return ResponseEntity.ok(CommonResponse.success());
+    }
 }
