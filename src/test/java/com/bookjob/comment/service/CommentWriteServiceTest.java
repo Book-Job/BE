@@ -91,7 +91,7 @@ public class CommentWriteServiceTest {
     class DeleteComment {
 
         @Test
-        void 자유게시판_게시글에_생성된_댓글을_삭제한다(){
+        void 자유게시판_게시글에_생성된_댓글을_삭제한다() {
             // given
             Long commentId = 1L;
             Long memberId = 1L;
@@ -99,6 +99,7 @@ public class CommentWriteServiceTest {
             Comment mockComment = mock(Comment.class);
 
             when(mockMember.getId()).thenReturn(memberId);
+            when(mockComment.getMemberId()).thenReturn(memberId);
             when(commentRepository.findById(commentId)).thenReturn(Optional.of(mockComment));
             doNothing().when(commentRepository).delete(mockComment);
 
