@@ -26,11 +26,19 @@ public class CommentFacade {
         commentWriteService.createComment(commentCreateRequest, boardId, member);
     }
 
-    public void updateComment(CommentUpdateRequest commentUpdateRequest, Long commentId, Long boardId, Member member) {
+    public void updateComment(CommentUpdateRequest commentUpdateRequest, Long boardId, Long commentId, Member member) {
         if (!boardReadService.notExistsBoard(boardId)) {
             throw NotFoundException.boardNotFound();
         }
 
         commentWriteService.updateComment(commentUpdateRequest, commentId, member);
+    }
+
+    public void deleteComment(Long boardId, Long commentId, Member member) {
+        if (!boardReadService.notExistsBoard(boardId)) {
+            throw NotFoundException.boardNotFound();
+        }
+
+        commentWriteService.deleteComment(commentId, member);
     }
 }

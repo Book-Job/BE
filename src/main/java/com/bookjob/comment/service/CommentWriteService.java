@@ -25,7 +25,6 @@ public class CommentWriteService {
                 .content(request.content())
                 .boardId(boardId)
                 .isAuthentic(isAuthentic)
-                .password(request.password())
                 .memberId(member.getId())
                 .nickname(request.nickname())
                 .build();
@@ -33,21 +32,29 @@ public class CommentWriteService {
         commentRepository.save(comment);
     }
 
-    public void updateComment(CommentUpdateRequest request, Long commentId, Member member){
+    public void updateComment(CommentUpdateRequest request, Long commentId, Member member) {
         Comment comment = commentRepository.findById(commentId).orElseThrow(
                 NotFoundException::commentNotFound
         );
 
-        if(comment.getIsAuthentic()){
-            if(!member.getId().equals(comment.getMemberId())){
+        if (comment.getIsAuthentic()) {
+            if (!member.getId().equals(comment.getMemberId())) {
                 throw ForbiddenException.commentForbidden();
             }
         }
 
-        if(!comment.getPassword().equals(request.password())){
+        comment.setContent(request.content());
+    }
+
+    public void deleteComment(Long commentId, Member member) {
+        Comment comment = commentRepository.findById(commentId).orElseThrow(
+                NotFoundException::commentNotFound
+        );
+
+        if (comment.getMemberId().equals(member.getId())) {
             throw ForbiddenException.commentForbidden();
         }
 
-        comment.setContent(request.content());
+        commentRepository.delete(comment);
     }
 }

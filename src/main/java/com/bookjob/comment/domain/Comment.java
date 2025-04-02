@@ -25,15 +25,12 @@ public class Comment extends SoftDeleteEntity {
     @Column(nullable = false)
     private String nickname;
 
-    private String password;
-
     private Boolean isAuthentic;
 
     @Builder
-    private Comment(Long memberId, String nickname, String password, Boolean isAuthentic, String content, Long boardId) {
+    private Comment(Long memberId, String nickname, Boolean isAuthentic, String content, Long boardId) {
         this.memberId = memberId;
         this.nickname = nickname;
-        this.password = password;
         this.isAuthentic = isAuthentic;
         this.content = content;
         this.boardId = boardId;
