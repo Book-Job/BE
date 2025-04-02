@@ -23,10 +23,15 @@ public class EmailVerification {
     @Column(nullable = false)
     private LocalDateTime expirationTime;
 
-    public EmailVerification(String toEmail, String code, LocalDateTime expirationTime) {
+    @Column(nullable = false)
+    @Enumerated(EnumType.STRING)
+    private EmailReason reason;
+
+    public EmailVerification(String toEmail, String code, LocalDateTime expirationTime, EmailReason reason) {
         this.email = toEmail;
         this.code = code;
         this.expirationTime = expirationTime;
+        this.reason = reason;
     }
 
     public void update(String code, LocalDateTime expirationTime) {

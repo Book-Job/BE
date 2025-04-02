@@ -3,6 +3,7 @@ package com.bookjob.email.service;
 import com.bookjob.common.exception.BadRequestException;
 import com.bookjob.common.exception.InternalServerError;
 import com.bookjob.email.domain.EmailBuilder;
+import com.bookjob.email.domain.EmailReason;
 import com.bookjob.email.domain.EmailVerification;
 import com.bookjob.email.dto.EmailVerificationRequest;
 import com.bookjob.email.repository.EmailVerificationRepository;
@@ -18,7 +19,6 @@ import org.springframework.transaction.annotation.Transactional;
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
 import java.time.LocalDateTime;
-import java.util.Optional;
 import java.util.Random;
 
 @Transactional
@@ -36,7 +36,7 @@ public class EmailService {
     @Value("${spring.mail.username}")
     private String FROM_EMAIL;
 
-    public void requestEmailVerification(String toEmail) {
+    public void requestEmailVerification(String toEmail, EmailReason reason) {
         // 1. 인증 번호 생성
         String code = createCode();
 
@@ -44,7 +44,7 @@ public class EmailService {
         sendEmail(FROM_EMAIL, toEmail, EMAIL_TITLE, EmailBuilder.buildEmail(code));
 
         // 3. 코드 저장 및 업데이트
-        saveOrUpdateVerification(toEmail, code);
+        saveOrUpdateVerification(toEmail, code, reason);
     }
 
     private String createCode() {
@@ -78,12 +78,12 @@ public class EmailService {
         }
     }
 
-    private void saveOrUpdateVerification(String toEmail, String code) {
+    private void saveOrUpdateVerification(String toEmail, String code, EmailReason reason) {
         LocalDateTime expirationTime = LocalDateTime.now().plusMinutes(EXPIRATION_MINUTES);
 
         // 이미 인증 메일을 보낸 사용자라면 인증 코드와 만료 시간 업데이트, 아니라면 새로 생성 후 저장
-        EmailVerification verification = emailVerificationRepository.findByEmail(toEmail)
-                .orElse(new EmailVerification(toEmail, code, expirationTime));
+        EmailVerification verification = emailVerificationRepository.findByEmailAndReason(toEmail, reason)
+                .orElse(new EmailVerification(toEmail, code, expirationTime, reason));
 
         verification.update(code, expirationTime);
         emailVerificationRepository.save(verification);
@@ -93,8 +93,10 @@ public class EmailService {
         String email = request.email();
         String code = request.code();
 
+        EmailReason reason = EmailReason.fromString(request.reason());
+
         EmailVerification verification = emailVerificationRepository
-                .findByEmailAndCode(email, code)
+                .findByEmailAndCodeAndReason(email, code, reason)
                 .orElseThrow(BadRequestException::invalidVerificationCode);
 
         if (verification.getExpirationTime().isBefore(LocalDateTime.now())) {

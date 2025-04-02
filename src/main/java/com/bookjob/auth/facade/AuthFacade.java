@@ -1,6 +1,7 @@
 package com.bookjob.auth.facade;
 
 import com.bookjob.auth.service.AuthService;
+import com.bookjob.email.domain.EmailReason;
 import com.bookjob.email.dto.EmailVerificationRequest;
 import com.bookjob.email.service.EmailService;
 import com.bookjob.member.service.MemberReadService;
@@ -17,7 +18,7 @@ public class AuthFacade {
 
     public void sendCodeToEmail(String email) {
         authService.checkDuplicatedEmail(email);
-        emailService.requestEmailVerification(email);
+        emailService.requestEmailVerification(email, EmailReason.REGISTER);
     }
 
     public void verifyCode(EmailVerificationRequest request) {
@@ -34,7 +35,7 @@ public class AuthFacade {
 
     public void sendCodeToEmailForLoginId(String email) {
         authService.doesEmailExist(email);
-        emailService.requestEmailVerification(email);
+        emailService.requestEmailVerification(email, EmailReason.LOGINID);
     }
 
     public String verifyCodeForLoginId(EmailVerificationRequest request) {

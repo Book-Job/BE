@@ -3,6 +3,7 @@ package com.bookjob.auth.controller;
 import com.bookjob.auth.dto.FindLoginIdResponse;
 import com.bookjob.auth.facade.AuthFacade;
 import com.bookjob.common.dto.CommonResponse;
+import com.bookjob.email.domain.EmailReason;
 import com.bookjob.email.dto.EmailRequest;
 import com.bookjob.email.dto.EmailVerificationRequest;
 import jakarta.validation.Valid;
@@ -59,6 +60,9 @@ public class AuthController {
         return ResponseEntity.ok(CommonResponse.success());
     }
 
+    /**
+     * 아이디 찾기 시 인증 번호 입력 후 확인 요청
+     */
     @PostMapping("/email-verification/id/code")
     public ResponseEntity<?> verifyCodeForLoginId(@Valid @RequestBody EmailVerificationRequest request) {
         String maskedLoginId = authFacade.verifyCodeForLoginId(request);
