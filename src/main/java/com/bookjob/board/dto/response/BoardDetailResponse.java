@@ -1,16 +1,17 @@
-package com.bookjob.board.dto;
+package com.bookjob.board.dto.response;
 
 import java.time.LocalDateTime;
 
-public record BoardPreviewResponse(
-        Long boardId,
+public record BoardDetailResponse(
         String title,
         String text,
         String nickname,
+        long commentCount,
         long viewCount,
         boolean isAuthentic,
-        long commentCount,
         LocalDateTime createdAt,
         LocalDateTime modifiedAt
 ) {
 }
+
+

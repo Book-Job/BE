@@ -1,4 +1,4 @@
-package com.bookjob.board.dto;
+package com.bookjob.board.dto.request;
 
 import jakarta.validation.constraints.NotBlank;
 
