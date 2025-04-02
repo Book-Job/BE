@@ -2,10 +2,7 @@ package com.bookjob.comment.domain;
 
 import com.bookjob.common.domain.SoftDeleteEntity;
 import jakarta.persistence.*;
-import lombok.AccessLevel;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 @Entity
 @Getter
@@ -21,6 +18,7 @@ public class Comment extends SoftDeleteEntity {
     @Column(nullable = false)
     private Long memberId;
 
+    @Setter
     @Column(nullable = false)
     private String content;
 
