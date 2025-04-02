@@ -27,7 +27,7 @@ public class CommentFacade {
     }
 
     public void updateComment(CommentUpdateRequest commentUpdateRequest, Long boardId, Long commentId, Member member) {
-        if (!boardReadService.notExistsBoard(boardId)) {
+        if (boardReadService.notExistsBoard(boardId)) {
             throw NotFoundException.boardNotFound();
         }
 
@@ -35,7 +35,7 @@ public class CommentFacade {
     }
 
     public void deleteComment(Long boardId, Long commentId, Member member) {
-        if (!boardReadService.notExistsBoard(boardId)) {
+        if (boardReadService.notExistsBoard(boardId)) {
             throw NotFoundException.boardNotFound();
         }
 

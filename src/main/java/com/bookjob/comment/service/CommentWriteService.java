@@ -51,7 +51,7 @@ public class CommentWriteService {
                 NotFoundException::commentNotFound
         );
 
-        if (comment.getMemberId().equals(member.getId())) {
+        if (!comment.getMemberId().equals(member.getId())) {
             throw ForbiddenException.commentForbidden();
         }
 
