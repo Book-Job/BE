@@ -38,8 +38,7 @@ public class CommentWriteServiceTest {
             String nickname = "test";
             CommentCreateRequest request = new CommentCreateRequest(
                     "새 댓글",
-                    nickname,
-                    "비밀번호"
+                    nickname
             );
             Member member = mock(Member.class);
             when(member.getId()).thenReturn(memberId);
@@ -65,14 +64,12 @@ public class CommentWriteServiceTest {
             Long boardId = 1L;
             Long commentId = 1L;
             Long memberId = 1L;
-            String password = "password";
-            CommentUpdateRequest request = new CommentUpdateRequest("수정된 글", password);
+            CommentUpdateRequest request = new CommentUpdateRequest("수정된 글");
             Member mockMember = mock(Member.class);
             Comment mockComment = spy(Comment.builder()
                     .nickname("nickname")
                     .isAuthentic(true)
                     .content("댓글")
-                    .password(password)
                     .memberId(memberId)
                     .boardId(boardId)
                     .build());
@@ -87,6 +84,32 @@ public class CommentWriteServiceTest {
             verify(commentRepository).findById(commentId);
             verify(mockComment).setContent(request.content());
             Assertions.assertThat(mockComment.getContent()).isEqualTo(request.content());
+        }
+    }
+
+    @Nested
+    class DeleteComment {
+
+        @Test
+        void 자유게시판_게시글에_생성된_댓글을_삭제한다() {
+            // given
+            Long commentId = 1L;
+            Long memberId = 1L;
+            Member mockMember = mock(Member.class);
+            Comment mockComment = mock(Comment.class);
+
+            when(mockMember.getId()).thenReturn(memberId);
+            when(mockComment.getMemberId()).thenReturn(memberId);
+            when(commentRepository.findById(commentId)).thenReturn(Optional.of(mockComment));
+            doNothing().when(commentRepository).delete(mockComment);
+
+            // when
+            commentWriteService.deleteComment(commentId, mockMember);
+
+            // then
+            ArgumentCaptor<Comment> captor = ArgumentCaptor.forClass(Comment.class);
+            verify(commentRepository).findById(commentId);
+            verify(commentRepository).delete(captor.capture());
         }
     }
 }
