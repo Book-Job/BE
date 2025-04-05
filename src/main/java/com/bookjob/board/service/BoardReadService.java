@@ -39,7 +39,7 @@ public class BoardReadService {
 
     public BoardDetailResponse getBoardDetails(Long boardId) {
         return boardRepository.findBoardById(boardId).orElseThrow(
-                NotFoundException::boardNotFound
+                () -> NotFoundException.boardNotFound(boardId)
         );
     }
 
