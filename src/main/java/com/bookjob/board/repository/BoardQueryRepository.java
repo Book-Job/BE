@@ -5,15 +5,15 @@ import com.bookjob.jooq.generated.tables.Board;
 import lombok.RequiredArgsConstructor;
 import org.jooq.Condition;
 import org.jooq.DSLContext;
-import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Repository;
 
 import java.util.List;
 
 import static com.bookjob.jooq.generated.tables.Board.BOARD;
 import static org.jooq.impl.DSL.noCondition;
 
+@Repository
 @RequiredArgsConstructor
-@Component
 public class BoardQueryRepository {
     private final DSLContext dslContext;
 
