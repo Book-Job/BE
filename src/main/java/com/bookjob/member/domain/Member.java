@@ -51,4 +51,8 @@ public class Member extends SoftDeleteEntity {
         this.role = MemberRole.MEMBER;
         this.isBlocked = false;
     }
+
+    public void updateNickname(String nickname) {
+        this.nickname = nickname;
+    }
 }
