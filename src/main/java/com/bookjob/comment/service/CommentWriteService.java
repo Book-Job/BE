@@ -22,7 +22,7 @@ public class CommentWriteService {
         boolean isAuthentic = request.nickname().equals(member.getNickname());
 
         Comment comment = Comment.builder()
-                .content(request.content())
+                .text(request.content())
                 .boardId(boardId)
                 .isAuthentic(isAuthentic)
                 .memberId(member.getId())
@@ -43,7 +43,7 @@ public class CommentWriteService {
             }
         }
 
-        comment.setContent(request.content());
+        comment.setText(request.content());
     }
 
     public void deleteComment(Long commentId, Member member) {
