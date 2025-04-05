@@ -47,4 +47,8 @@ public class AuthFacade {
         return memberReadService.getMaskedEmail(loginId);
     }
 
+    public void sendCodeToEmailForPassword(String email) {
+        authService.doesEmailExist(email);
+        emailService.requestEmailVerification(email, EmailReason.PASSWORD);
+    }
 }
