@@ -7,7 +7,6 @@ import com.bookjob.board.dto.response.CursorBoardResponse;
 import com.bookjob.board.service.BoardReadService;
 import com.bookjob.board.service.BoardWriteService;
 import com.bookjob.member.domain.Member;
-import com.bookjob.member.service.MemberReadService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
@@ -16,12 +15,10 @@ import org.springframework.stereotype.Component;
 public class BoardFacade {
 
     private final BoardWriteService boardWriteService;
-    private final MemberReadService memberReadService;
     private final BoardReadService boardReadService;
 
     public void createBoard(BoardCreateRequest request, Member member) {
-        Member activeMember = memberReadService.getActiveMemberById(member.getId());
-        boardWriteService.createBoard(request, activeMember);
+        boardWriteService.createBoard(request, member);
     }
 
     public CursorBoardResponse getBoardsAfterCursorWithKeyword(String keyword, Long cursor, int pageSize) {
@@ -29,8 +26,7 @@ public class BoardFacade {
     }
 
     public void updateBoard(BoardUpdateRequest request, Member member, Long boardId) {
-        Member activeMember = memberReadService.getActiveMemberById(member.getId());
-        boardWriteService.updateBoard(request, activeMember, boardId);
+        boardWriteService.updateBoard(request, member, boardId);
     }
 
     public void deleteBoard(Long boardId, Member member) {
