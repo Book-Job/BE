@@ -7,6 +7,7 @@ import com.bookjob.board.repository.BoardRepository;
 import com.bookjob.common.exception.ForbiddenException;
 import com.bookjob.common.exception.NotFoundException;
 import com.bookjob.member.domain.Member;
+import com.bookjob.member.dto.BoardIdsRequest;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -34,7 +35,7 @@ public class BoardWriteService {
 
     public void updateBoard(BoardUpdateRequest request, Member member, Long boardId) {
         Board board = boardRepository.findById(boardId).orElseThrow(
-                NotFoundException::boardNotFound
+                () -> NotFoundException.boardNotFound(boardId)
         );
 
         if (!board.getMemberId().equals(member.getId())) {
@@ -46,11 +47,29 @@ public class BoardWriteService {
 
     public void deleteBoard(Long boardId, Member member) {
         Board board = boardRepository.findById(boardId).orElseThrow(
-                NotFoundException::boardNotFound
+                () -> NotFoundException.boardNotFound(boardId)
         );
 
         if (!board.getMemberId().equals(member.getId())) {
             throw ForbiddenException.forbidden();
+        }
+
+        board.delete();
+    }
+
+    public void deleteMyPostingsInBoard(Member member, BoardIdsRequest request) {
+        for (Long boardId : request.ids()) {
+            deleteBoard(member, boardId);
+        }
+    }
+
+    private void deleteBoard(Member member, Long boardId) {
+        Board board = boardRepository.findById(boardId).orElseThrow(
+                () -> NotFoundException.boardNotFound(boardId)
+        );
+
+        if (!board.getMemberId().equals(member.getId())) {
+            throw ForbiddenException.boardForbidden();
         }
 
         board.delete();

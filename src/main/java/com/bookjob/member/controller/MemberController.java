@@ -47,4 +47,11 @@ public class MemberController {
         MyPostingsInBoardResponse myPostingsInBoardResponse = memberFacade.getMyPostingsInBoard(member);
         return ResponseEntity.ok(CommonResponse.success(myPostingsInBoardResponse));
     }
+
+    @DeleteMapping("/boards")
+    public ResponseEntity<?> deleteMyPostingsInBoard(@AuthenticationPrincipal(expression = "member") Member member,
+                                                   @Valid @RequestBody BoardIdsRequest request) {
+        memberFacade.deleteMyPostingsInBoard(member, request);
+        return ResponseEntity.ok(CommonResponse.success());
+    }
 }

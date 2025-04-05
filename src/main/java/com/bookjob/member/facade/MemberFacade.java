@@ -2,6 +2,7 @@ package com.bookjob.member.facade;
 
 import com.bookjob.auth.service.AuthService;
 import com.bookjob.board.service.BoardReadService;
+import com.bookjob.board.service.BoardWriteService;
 import com.bookjob.member.domain.Member;
 import com.bookjob.member.dto.*;
 import com.bookjob.member.service.MemberReadService;
@@ -16,6 +17,7 @@ public class MemberFacade {
     private final MemberReadService memberReadService;
     private final AuthService authService;
     private final BoardReadService boardReadService;
+    private final BoardWriteService boardWriteService;
 
     public void saveMember(MemberSignupRequest request) {
         memberWriteService.registerMember(request);
@@ -36,5 +38,9 @@ public class MemberFacade {
 
     public MyPostingsInBoardResponse getMyPostingsInBoard(Member member) {
         return boardReadService.getMyPostingsInBoard(member);
+    }
+
+    public void deleteMyPostingsInBoard(Member member, BoardIdsRequest request) {
+        boardWriteService.deleteMyPostingsInBoard(member, request);
     }
 }
