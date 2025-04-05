@@ -2,6 +2,7 @@ package com.bookjob.comment.controller;
 
 import com.bookjob.comment.dto.request.CommentCreateRequest;
 import com.bookjob.comment.dto.request.CommentUpdateRequest;
+import com.bookjob.comment.dto.response.CommentResponse;
 import com.bookjob.comment.facade.CommentFacade;
 import com.bookjob.common.dto.CommonResponse;
 import com.bookjob.member.domain.Member;
@@ -10,12 +11,16 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("/api/v1/boards/{boardId}/comments")
 @RequiredArgsConstructor
 public class CommentController {
 
     private final CommentFacade commentFacade;
+
+    private static final int COMMENT_SIZE = 20;
 
     @PostMapping
     public ResponseEntity<?> createComment(@RequestBody CommentCreateRequest commentCreateRequest,
@@ -44,5 +49,13 @@ public class CommentController {
         commentFacade.deleteComment(boardId, commentId, member);
 
         return ResponseEntity.ok(CommonResponse.success());
+    }
+
+    @GetMapping
+    public ResponseEntity<?> getComments(@PathVariable("boardId") Long boardId,
+                                         @RequestParam("lastComment") Long lastCommentId) {
+        List<CommentResponse> response = commentFacade.getComments(boardId, lastCommentId, COMMENT_SIZE);
+
+        return ResponseEntity.ok(CommonResponse.success(response));
     }
 }
