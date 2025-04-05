@@ -2,6 +2,7 @@ package com.bookjob.member.controller;
 
 import com.bookjob.common.dto.CommonResponse;
 import com.bookjob.member.domain.Member;
+import com.bookjob.member.dto.MemberDetailResponse;
 import com.bookjob.member.dto.MyPageResponse;
 import com.bookjob.member.facade.MemberFacade;
 import com.bookjob.member.dto.MemberSignupRequest;
@@ -28,5 +29,11 @@ public class MemberController {
     public ResponseEntity<?> getMyPage(@AuthenticationPrincipal(expression = "member") Member member) {
         MyPageResponse myPageResponse = memberFacade.getMyPage(member);
         return ResponseEntity.ok(CommonResponse.success(myPageResponse));
+    }
+
+    @GetMapping("/detail")
+    public ResponseEntity<?> getMemberDetail(@AuthenticationPrincipal(expression = "member") Member member) {
+        MemberDetailResponse memberDetailResponse = memberFacade.getMemberDetail(member);
+        return ResponseEntity.ok(CommonResponse.success(memberDetailResponse));
     }
 }

@@ -3,6 +3,7 @@ package com.bookjob.member.service;
 import com.bookjob.common.exception.NotFoundException;
 import com.bookjob.common.exception.UnAuthorizedException;
 import com.bookjob.member.domain.Member;
+import com.bookjob.member.dto.MemberDetailResponse;
 import com.bookjob.member.dto.MyPageResponse;
 import com.bookjob.member.repository.MemberRepository;
 import lombok.RequiredArgsConstructor;
@@ -69,5 +70,9 @@ public class MemberReadService {
 
     public MyPageResponse getMyPage(Member member) {
         return memberRepository.getMyPageById(member.getId());
+    }
+
+    public MemberDetailResponse getMemberDetail(Member member) {
+        return memberRepository.getMemberDetailById(member.getId());
     }
 }
