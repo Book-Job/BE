@@ -37,10 +37,8 @@ public class CommentWriteService {
                 NotFoundException::commentNotFound
         );
 
-        if (comment.getIsAuthentic()) {
-            if (!member.getId().equals(comment.getMemberId())) {
-                throw ForbiddenException.commentForbidden();
-            }
+        if (!member.getId().equals(comment.getMemberId())) {
+            throw ForbiddenException.commentForbidden();
         }
 
         comment.setText(request.content());
@@ -51,7 +49,7 @@ public class CommentWriteService {
                 NotFoundException::commentNotFound
         );
 
-        if (!comment.getMemberId().equals(member.getId())) {
+        if (!member.getId().equals(comment.getMemberId())) {
             throw ForbiddenException.commentForbidden();
         }
 
