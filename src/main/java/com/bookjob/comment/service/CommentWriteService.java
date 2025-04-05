@@ -53,6 +53,6 @@ public class CommentWriteService {
             throw ForbiddenException.commentForbidden();
         }
 
-        commentRepository.delete(comment);
+        comment.delete();
     }
 }

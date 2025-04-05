@@ -33,7 +33,9 @@ public class BoardQueryRepository {
                         b.MODIFIED_AT
                 )
                 .from(b)
-                .where(boardListKeywordCondition(keyword).and(boardIdCursorCondition(cursor)))
+                .where(boardListKeywordCondition(keyword)
+                        .and(boardIdCursorCondition(cursor))
+                        .and(BOARD.DELETED_AT.isNull()))
                 .orderBy(b.CREATED_AT.desc())
                 .limit(limit)
                 .fetchInto(BoardPreviewResponse.class);

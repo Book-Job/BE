@@ -18,7 +18,7 @@ import java.util.Date;
 @Component
 public class JwtProvider {
 
-    private static final long expireTime = 60 * 60 * 24 * 7;
+    private static final long expireTime = 60 * 60 * 24 * 7 * 1000;
     private static final String BEARER_PREFIX = "Bearer ";
     private final SecretKey key;
 

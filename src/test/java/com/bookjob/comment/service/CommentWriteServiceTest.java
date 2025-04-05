@@ -5,7 +5,6 @@ import com.bookjob.comment.dto.request.CommentCreateRequest;
 import com.bookjob.comment.dto.request.CommentUpdateRequest;
 import com.bookjob.comment.repository.CommentRepository;
 import com.bookjob.member.domain.Member;
-import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -16,6 +15,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.Optional;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
@@ -51,7 +51,7 @@ public class CommentWriteServiceTest {
             ArgumentCaptor<Comment> captor = ArgumentCaptor.forClass(Comment.class);
             verify(commentRepository).save(captor.capture());
 
-            Assertions.assertThat(nickname).isEqualTo(captor.getValue().getNickname());
+            assertThat(nickname).isEqualTo(captor.getValue().getNickname());
         }
     }
 
@@ -83,7 +83,7 @@ public class CommentWriteServiceTest {
             // then
             verify(commentRepository).findById(commentId);
             verify(mockComment).setText(request.content());
-            Assertions.assertThat(mockComment.getText()).isEqualTo(request.content());
+            assertThat(mockComment.getText()).isEqualTo(request.content());
         }
     }
 
@@ -96,20 +96,19 @@ public class CommentWriteServiceTest {
             Long commentId = 1L;
             Long memberId = 1L;
             Member mockMember = mock(Member.class);
-            Comment mockComment = mock(Comment.class);
+
+            Comment spyComment = spy(Comment.builder().memberId(memberId).build());
 
             when(mockMember.getId()).thenReturn(memberId);
-            when(mockComment.getMemberId()).thenReturn(memberId);
-            when(commentRepository.findById(commentId)).thenReturn(Optional.of(mockComment));
-            doNothing().when(commentRepository).delete(mockComment);
+            when(commentRepository.findById(commentId)).thenReturn(Optional.of(spyComment));
 
             // when
             commentWriteService.deleteComment(commentId, mockMember);
 
             // then
-            ArgumentCaptor<Comment> captor = ArgumentCaptor.forClass(Comment.class);
             verify(commentRepository).findById(commentId);
-            verify(commentRepository).delete(captor.capture());
+            verify(spyComment).delete();
+            assertThat(spyComment.getDeletedAt()).isNotNull();
         }
     }
 }
