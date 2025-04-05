@@ -9,6 +9,9 @@ public record EmailVerificationRequest (
         String email,
 
         @NotBlank
-        String code
+        String code,
+
+        @NotBlank
+        String reason
 ) {
 }
