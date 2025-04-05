@@ -69,7 +69,7 @@ public class CommentWriteServiceTest {
             Comment mockComment = spy(Comment.builder()
                     .nickname("nickname")
                     .isAuthentic(true)
-                    .content("댓글")
+                    .text("댓글")
                     .memberId(memberId)
                     .boardId(boardId)
                     .build());
@@ -82,8 +82,8 @@ public class CommentWriteServiceTest {
 
             // then
             verify(commentRepository).findById(commentId);
-            verify(mockComment).setContent(request.content());
-            Assertions.assertThat(mockComment.getContent()).isEqualTo(request.content());
+            verify(mockComment).setText(request.content());
+            Assertions.assertThat(mockComment.getText()).isEqualTo(request.content());
         }
     }
 
