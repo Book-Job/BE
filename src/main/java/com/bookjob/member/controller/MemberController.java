@@ -1,15 +1,15 @@
 package com.bookjob.member.controller;
 
 import com.bookjob.common.dto.CommonResponse;
+import com.bookjob.member.domain.Member;
+import com.bookjob.member.dto.MyPageResponse;
 import com.bookjob.member.facade.MemberFacade;
 import com.bookjob.member.dto.MemberSignupRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/v1/members")
@@ -19,8 +19,14 @@ public class MemberController {
     private final MemberFacade memberFacade;
 
     @PostMapping("/signup")
-    public ResponseEntity<CommonResponse<Void>> signup(@Valid @RequestBody MemberSignupRequest request) {
+    public ResponseEntity<?> signup(@Valid @RequestBody MemberSignupRequest request) {
         memberFacade.saveMember(request);
         return ResponseEntity.ok(CommonResponse.success());
+    }
+
+    @GetMapping("/mypage")
+    public ResponseEntity<?> getMyPage(@AuthenticationPrincipal(expression = "member") Member member) {
+        MyPageResponse myPageResponse = memberFacade.getMyPage(member);
+        return ResponseEntity.ok(CommonResponse.success(myPageResponse));
     }
 }

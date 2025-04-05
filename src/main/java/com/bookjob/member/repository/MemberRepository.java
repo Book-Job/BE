@@ -1,6 +1,7 @@
 package com.bookjob.member.repository;
 
 import com.bookjob.member.domain.Member;
+import com.bookjob.member.dto.MyPageResponse;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
@@ -26,4 +27,12 @@ public interface MemberRepository extends JpaRepository<Member, Long> {
     select m.email from Member m where m.loginId = :loginId
     """)
     String findEmailByLoginId(String loginId);
+
+    @Query("""
+    select new com.bookjob.member.dto.MyPageResponse(
+    m.nickname, m.email)
+    from Member m
+    where m.id = :id
+    """)
+    MyPageResponse getMyPageById(Long id);
 }
