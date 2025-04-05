@@ -13,7 +13,7 @@ public interface CommentRepository extends JpaRepository<Comment, Long> {
             SELECT new com.bookjob.comment.dto.response.CommentResponse(
             c.id, c.text, c.nickname, c.isAuthentic, c.createdAt, c.modifiedAt)
             FROM Comment c
-            WHERE c.boardId = :boardId AND c.id < :cursorId
+            WHERE c.boardId = :boardId AND c.id < :cursorId AND c.deletedAt IS NULL
             ORDER BY c.createdAt DESC
             LIMIT :limit
             """)
