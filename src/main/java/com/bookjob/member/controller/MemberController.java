@@ -4,6 +4,7 @@ import com.bookjob.common.dto.CommonResponse;
 import com.bookjob.member.domain.Member;
 import com.bookjob.member.dto.MemberDetailResponse;
 import com.bookjob.member.dto.MyPageResponse;
+import com.bookjob.member.dto.UpdateNicknameRequest;
 import com.bookjob.member.facade.MemberFacade;
 import com.bookjob.member.dto.MemberSignupRequest;
 import jakarta.validation.Valid;
@@ -35,5 +36,12 @@ public class MemberController {
     public ResponseEntity<?> getMemberDetail(@AuthenticationPrincipal(expression = "member") Member member) {
         MemberDetailResponse memberDetailResponse = memberFacade.getMemberDetail(member);
         return ResponseEntity.ok(CommonResponse.success(memberDetailResponse));
+    }
+
+    @PatchMapping("/nickname")
+    public ResponseEntity<?> updateNickname(@AuthenticationPrincipal(expression = "member") Member member,
+                                            @Valid @RequestBody UpdateNicknameRequest request) {
+        memberFacade.updateNickname(member, request);
+        return ResponseEntity.ok(CommonResponse.success());
     }
 }
