@@ -1,11 +1,9 @@
 package com.bookjob.member.facade;
 
 import com.bookjob.auth.service.AuthService;
+import com.bookjob.board.service.BoardReadService;
 import com.bookjob.member.domain.Member;
-import com.bookjob.member.dto.MemberDetailResponse;
-import com.bookjob.member.dto.MemberSignupRequest;
-import com.bookjob.member.dto.MyPageResponse;
-import com.bookjob.member.dto.UpdateNicknameRequest;
+import com.bookjob.member.dto.*;
 import com.bookjob.member.service.MemberReadService;
 import com.bookjob.member.service.MemberWriteService;
 import lombok.RequiredArgsConstructor;
@@ -17,6 +15,7 @@ public class MemberFacade {
     private final MemberWriteService memberWriteService;
     private final MemberReadService memberReadService;
     private final AuthService authService;
+    private final BoardReadService boardReadService;
 
     public void saveMember(MemberSignupRequest request) {
         memberWriteService.registerMember(request);
@@ -33,5 +32,9 @@ public class MemberFacade {
     public void updateNickname(Member member, UpdateNicknameRequest request) {
         authService.checkDuplicatedNickname(request.nickname());
         memberWriteService.updateNickname(member, request);
+    }
+
+    public MyPostingsInBoardResponse getMyPostingsInBoard(Member member) {
+        return boardReadService.getMyPostingsInBoard(member);
     }
 }

@@ -2,11 +2,8 @@ package com.bookjob.member.controller;
 
 import com.bookjob.common.dto.CommonResponse;
 import com.bookjob.member.domain.Member;
-import com.bookjob.member.dto.MemberDetailResponse;
-import com.bookjob.member.dto.MyPageResponse;
-import com.bookjob.member.dto.UpdateNicknameRequest;
+import com.bookjob.member.dto.*;
 import com.bookjob.member.facade.MemberFacade;
-import com.bookjob.member.dto.MemberSignupRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -43,5 +40,11 @@ public class MemberController {
                                             @Valid @RequestBody UpdateNicknameRequest request) {
         memberFacade.updateNickname(member, request);
         return ResponseEntity.ok(CommonResponse.success());
+    }
+
+    @GetMapping("/boards")
+    public ResponseEntity<?> getMyPostingsInBoard(@AuthenticationPrincipal(expression = "member") Member member) {
+        MyPostingsInBoardResponse myPostingsInBoardResponse = memberFacade.getMyPostingsInBoard(member);
+        return ResponseEntity.ok(CommonResponse.success(myPostingsInBoardResponse));
     }
 }
