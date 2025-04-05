@@ -6,6 +6,9 @@ import com.bookjob.board.dto.response.CursorBoardResponse;
 import com.bookjob.board.repository.BoardQueryRepository;
 import com.bookjob.board.repository.BoardRepository;
 import com.bookjob.common.exception.NotFoundException;
+import com.bookjob.member.domain.Member;
+import com.bookjob.member.dto.MyPostingsInBoard;
+import com.bookjob.member.dto.MyPostingsInBoardResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -36,11 +39,17 @@ public class BoardReadService {
 
     public BoardDetailResponse getBoardDetails(Long boardId) {
         return boardRepository.findBoardById(boardId).orElseThrow(
-                NotFoundException::boardNotFound
+                () -> NotFoundException.boardNotFound(boardId)
         );
     }
 
     public boolean notExistsBoard(Long boardId) {
         return !boardRepository.existsById(boardId);
+    }
+
+    public MyPostingsInBoardResponse getMyPostingsInBoard(Member member) {
+        List<MyPostingsInBoard> myPostingsInBoardList =
+                boardRepository.findMyPostingsByMemberId(member.getId());
+        return new MyPostingsInBoardResponse(myPostingsInBoardList);
     }
 }

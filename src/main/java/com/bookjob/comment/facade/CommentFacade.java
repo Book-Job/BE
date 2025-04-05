@@ -25,7 +25,7 @@ public class CommentFacade {
 
     public void createComment(CommentCreateRequest commentCreateRequest, Long boardId, Member member) {
         if (boardReadService.notExistsBoard(boardId)) {
-            throw NotFoundException.boardNotFound();
+            throw NotFoundException.boardNotFound(boardId);
         }
 
         commentWriteService.createComment(commentCreateRequest, boardId, member);
@@ -33,7 +33,7 @@ public class CommentFacade {
 
     public void updateComment(CommentUpdateRequest commentUpdateRequest, Long boardId, Long commentId, Member member) {
         if (boardReadService.notExistsBoard(boardId)) {
-            throw NotFoundException.boardNotFound();
+            throw NotFoundException.boardNotFound(boardId);
         }
 
         commentWriteService.updateComment(commentUpdateRequest, commentId, member);
@@ -41,7 +41,7 @@ public class CommentFacade {
 
     public void deleteComment(Long boardId, Long commentId, Member member) {
         if (boardReadService.notExistsBoard(boardId)) {
-            throw NotFoundException.boardNotFound();
+            throw NotFoundException.boardNotFound(boardId);
         }
 
         commentWriteService.deleteComment(commentId, member);
