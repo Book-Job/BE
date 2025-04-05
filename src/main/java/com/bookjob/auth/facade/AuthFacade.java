@@ -42,4 +42,9 @@ public class AuthFacade {
         emailService.verifyCode(request);
         return memberReadService.getMaskedLoginId(request.email());
     }
+
+    public String checkLoginIdExists(String loginId) {
+        return memberReadService.getMaskedEmail(loginId);
+    }
+
 }

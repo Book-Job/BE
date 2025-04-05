@@ -1,9 +1,9 @@
 package com.bookjob.auth.controller;
 
 import com.bookjob.auth.dto.FindLoginIdResponse;
+import com.bookjob.auth.dto.MaskedEmailResponse;
 import com.bookjob.auth.facade.AuthFacade;
 import com.bookjob.common.dto.CommonResponse;
-import com.bookjob.email.domain.EmailReason;
 import com.bookjob.email.dto.EmailRequest;
 import com.bookjob.email.dto.EmailVerificationRequest;
 import jakarta.validation.Valid;
@@ -68,4 +68,15 @@ public class AuthController {
         String maskedLoginId = authFacade.verifyCodeForLoginId(request);
         return ResponseEntity.ok(CommonResponse.success(new FindLoginIdResponse(maskedLoginId)));
     }
+
+    /**
+     * 비밀번호 찾기 시 아이디가 존재하는지 확인하는 API
+     */
+    @GetMapping("/exist-id")
+    public ResponseEntity<?> checkLoginIdExists(
+            @RequestParam(name = "loginId") @NotBlank(message = "아이디는 필수 입력값입니다.") String loginId) {
+        String maskedEmail = authFacade.checkLoginIdExists(loginId);
+        return ResponseEntity.ok(CommonResponse.success(new MaskedEmailResponse(maskedEmail)));
+    }
+
 }

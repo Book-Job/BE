@@ -21,4 +21,9 @@ public interface MemberRepository extends JpaRepository<Member, Long> {
     select m.loginId from Member m where m.email = :email
     """)
     String findLoginIdByEmail(String email);
+
+    @Query("""
+    select m.email from Member m where m.loginId = :loginId
+    """)
+    String findEmailByLoginId(String loginId);
 }
