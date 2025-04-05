@@ -87,4 +87,13 @@ public class AuthController {
         authFacade.sendCodeToEmailForPassword(request.email());
         return ResponseEntity.ok(CommonResponse.success());
     }
+
+    /**
+     * 비밀번호 찾기 시, 이메일 인증 요청
+     */
+    @PostMapping("/email-verification/pw/code")
+    public ResponseEntity<?> verifyCodeForPassword(@Valid @RequestBody EmailVerificationRequest request) {
+        authFacade.verifyCodeForPassword(request);
+        return ResponseEntity.ok(CommonResponse.success());
+    }
 }

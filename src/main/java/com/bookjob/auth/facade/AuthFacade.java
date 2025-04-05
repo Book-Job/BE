@@ -51,4 +51,8 @@ public class AuthFacade {
         authService.doesEmailExist(email);
         emailService.requestEmailVerification(email, EmailReason.PASSWORD);
     }
+
+    public void verifyCodeForPassword(EmailVerificationRequest request) {
+        emailService.verifyCode(request);
+    }
 }
