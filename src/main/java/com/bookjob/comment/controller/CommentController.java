@@ -53,7 +53,7 @@ public class CommentController {
 
     @GetMapping
     public ResponseEntity<?> getComments(@PathVariable("boardId") Long boardId,
-                                         @RequestParam("lastComment") Long lastCommentId) {
+                                         @RequestParam(value = "lastComment", required = false) Long lastCommentId) {
         List<CommentResponse> response = commentFacade.getComments(boardId, lastCommentId, COMMENT_SIZE);
 
         return ResponseEntity.ok(CommonResponse.success(response));
