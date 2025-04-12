@@ -17,7 +17,7 @@ public class JobPostingFacade {
     private final JobPostingWriteService jobPostingWriteService;
     private final JobPostingReadService jobPostingReadService;
 
-    public void createJobPosting(JobPostingCreateRequest request, Member member){
+    public void createJobPosting(JobPostingCreateRequest request, Member member) {
         jobPostingWriteService.createJobPosting(request, member);
     }
 
@@ -29,5 +29,9 @@ public class JobPostingFacade {
 
     public void updateJobPosting(Long id, JobPostingUpdateRequest request, Member member) {
         jobPostingWriteService.updateJobPosting(id, request, member);
+    }
+
+    public void deleteJobPosting(Long id, Member member) {
+        jobPostingWriteService.deleteJobPosting(id, member);
     }
 }

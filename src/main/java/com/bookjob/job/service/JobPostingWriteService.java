@@ -66,4 +66,16 @@ public class JobPostingWriteService {
                 request.location()
         );
     }
+
+    public void deleteJobPosting(Long id, Member member) {
+        JobPosting jobPosting = jobPostingRepository.findById(id).orElseThrow(
+                NotFoundException::jobPostingNotFound
+        );
+
+        if (!jobPosting.getMemberId().equals(member.getId())) {
+            throw ForbiddenException.forbidden();
+        }
+
+        jobPostingRepository.delete(jobPosting);
+    }
 }
