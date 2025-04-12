@@ -12,6 +12,10 @@ import java.time.LocalDateTime;
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
+@Table(indexes = {
+        @Index(name = "idx_job_posting_created_at", columnList = "createdAt"),
+        @Index(name = "idx_job_posting_closing_date", columnList = "closingDate")
+})
 public class JobPosting extends SoftDeleteEntity {
 
     @Id
@@ -68,9 +72,5 @@ public class JobPosting extends SoftDeleteEntity {
         this.text = text;
         this.title = title;
         this.websiteUrl = websiteUrl;
-    }
-
-    public void incrementViewCount() {
-        this.viewCount++;
     }
 }

@@ -9,7 +9,7 @@ public enum JobCategory {
         try {
             return JobCategory.valueOf(value.toUpperCase());
         } catch (IllegalArgumentException e) {
-            throw BadRequestException.invalidJobCategory(value);
+            throw BadRequestException.invalidEnumValue(value, JobCategory.class);
         }
     }
 }
