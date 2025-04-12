@@ -1,9 +1,12 @@
 package com.bookjob.job.service;
 
+import com.bookjob.common.exception.ForbiddenException;
+import com.bookjob.common.exception.NotFoundException;
 import com.bookjob.job.domain.EmploymentType;
 import com.bookjob.job.domain.JobCategory;
 import com.bookjob.job.domain.JobPosting;
 import com.bookjob.job.dto.request.JobPostingCreateRequest;
+import com.bookjob.job.dto.request.JobPostingUpdateRequest;
 import com.bookjob.job.repository.JobPostingRepository;
 import com.bookjob.member.domain.Member;
 import lombok.RequiredArgsConstructor;
@@ -37,5 +40,30 @@ public class JobPostingWriteService {
                 .build();
 
         jobPostingRepository.save(jobPosting);
+    }
+
+    public void updateJobPosting(Long id, JobPostingUpdateRequest request, Member member) {
+        JobCategory jobCategory = JobCategory.fromString(request.jobCategory());
+        EmploymentType employmentType = EmploymentType.fromString(request.employmentType());
+
+        JobPosting jobPosting = jobPostingRepository.findById(id).orElseThrow(
+                NotFoundException::jobPostingNotFound
+        );
+
+        if (!jobPosting.getMemberId().equals(member.getId())) {
+            throw ForbiddenException.forbidden();
+        }
+
+        jobPosting.update(
+                request.title(),
+                request.text(),
+                request.websiteUrl(),
+                request.experienceMin(),
+                request.experienceMax(),
+                request.closingDate(),
+                employmentType,
+                jobCategory,
+                request.location()
+        );
     }
 }
