@@ -7,7 +7,7 @@ public record JobPostingCreateRequest(
         String text,
         String jobCategory,
         String employmentType,
-        String writer,
+        String nickname,
         String websiteUrl,
         String location,
         int experienceMin,
