@@ -49,7 +49,7 @@ public class CommentFacade {
 
     public List<CommentResponse> getComments(Long boardId, Long lastComment, int size) {
         if (boardReadService.notExistsBoard(boardId)) {
-            throw NotFoundException.boardNotFound();
+            throw NotFoundException.boardNotFound(boardId);
         }
 
         return commentReadService.getCommentByBoardId(boardId, lastComment, size);
