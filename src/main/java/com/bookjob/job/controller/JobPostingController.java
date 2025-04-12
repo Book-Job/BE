@@ -43,4 +43,12 @@ public class JobPostingController {
 
         return ResponseEntity.ok(CommonResponse.success());
     }
+
+    @DeleteMapping("{jobPostingId}")
+    public ResponseEntity<?> deleteJobPosting(@PathVariable Long jobPostingId,
+                                              @AuthenticationPrincipal(expression = "member") Member member) {
+        jobPostingFacade.deleteJobPosting(jobPostingId, member);
+
+        return ResponseEntity.ok(CommonResponse.success());
+    }
 }
