@@ -8,6 +8,7 @@ public class NotFoundException extends BaseException {
     static private final String COMMENT_NOT_FOUND = "댓글을 찾을 수 없습니다.";
     static private final String LOGINID_NOT_FOUND = "로그인 아이디를 찾을 수 없습니다.";
     static private final String MEMBER_NOT_FOUND = "회원을 찾을 수 없습니다.";
+    static private final String JOB_POSTING_NOT_FOUND = "구인 글을 찾을 수 없습니다.";
 
     public NotFoundException(String message) {
         super(message, HttpStatus.NOT_FOUND);
@@ -34,4 +35,7 @@ public class NotFoundException extends BaseException {
         return new NotFoundException(MEMBER_NOT_FOUND);
     }
 
+    public static NotFoundException jobPostingNotFound() {
+        return new NotFoundException(JOB_POSTING_NOT_FOUND);
+    }
 }
