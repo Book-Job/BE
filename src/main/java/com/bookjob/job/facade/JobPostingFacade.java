@@ -4,6 +4,7 @@ import com.bookjob.job.domain.JobPostingOrder;
 import com.bookjob.job.dto.request.JobPostingCreateRequest;
 import com.bookjob.job.dto.request.JobPostingUpdateRequest;
 import com.bookjob.job.dto.response.CursorJobPostingResponse;
+import com.bookjob.job.dto.response.JobPostingDetailsResponse;
 import com.bookjob.job.service.JobPostingReadService;
 import com.bookjob.job.service.JobPostingWriteService;
 import com.bookjob.member.domain.Member;
@@ -33,5 +34,9 @@ public class JobPostingFacade {
 
     public void deleteJobPosting(Long id, Member member) {
         jobPostingWriteService.deleteJobPosting(id, member);
+    }
+
+    public JobPostingDetailsResponse getJobPostingDetails(Long id) {
+        return jobPostingReadService.getJobPostingDetails(id);
     }
 }
