@@ -73,4 +73,19 @@ public class JobPosting extends SoftDeleteEntity {
         this.title = title;
         this.websiteUrl = websiteUrl;
     }
+
+    public void update(String title, String text, String websiteUrl,
+                       Integer experienceMin, Integer experienceMax,
+                       LocalDateTime closingDate, EmploymentType employmentType,
+                       JobCategory jobCategory, String location) {
+        this.title = title;
+        this.text = text;
+        this.websiteUrl = websiteUrl;
+        this.experienceMin = experienceMin;
+        this.experienceMax = experienceMax;
+        this.closingDate = closingDate;
+        this.employmentType = employmentType;
+        this.jobCategory = jobCategory;
+        this.location = location;
+    }
 }
