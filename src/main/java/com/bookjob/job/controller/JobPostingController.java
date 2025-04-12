@@ -4,6 +4,7 @@ import com.bookjob.common.dto.CommonResponse;
 import com.bookjob.job.dto.request.JobPostingCreateRequest;
 import com.bookjob.job.dto.request.JobPostingUpdateRequest;
 import com.bookjob.job.dto.response.CursorJobPostingResponse;
+import com.bookjob.job.dto.response.JobPostingDetailsResponse;
 import com.bookjob.job.facade.JobPostingFacade;
 import com.bookjob.member.domain.Member;
 import lombok.RequiredArgsConstructor;
@@ -50,5 +51,12 @@ public class JobPostingController {
         jobPostingFacade.deleteJobPosting(jobPostingId, member);
 
         return ResponseEntity.ok(CommonResponse.success());
+    }
+
+    @GetMapping("{jobPostingId}")
+    public ResponseEntity<?> getJobPosting(@PathVariable Long jobPostingId) {
+        JobPostingDetailsResponse response = jobPostingFacade.getJobPostingDetails(jobPostingId);
+
+        return ResponseEntity.ok(CommonResponse.success(response));
     }
 }
