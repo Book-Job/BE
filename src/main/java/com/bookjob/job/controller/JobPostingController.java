@@ -2,6 +2,7 @@ package com.bookjob.job.controller;
 
 import com.bookjob.common.dto.CommonResponse;
 import com.bookjob.job.dto.request.JobPostingCreateRequest;
+import com.bookjob.job.dto.request.JobPostingUpdateRequest;
 import com.bookjob.job.dto.response.CursorJobPostingResponse;
 import com.bookjob.job.facade.JobPostingFacade;
 import com.bookjob.member.domain.Member;
@@ -32,5 +33,14 @@ public class JobPostingController {
         CursorJobPostingResponse response = jobPostingFacade.getJobPostings(order, last, pageSize);
 
         return ResponseEntity.ok(CommonResponse.success(response));
+    }
+
+    @PatchMapping("{jobPostingId}")
+    public ResponseEntity<?> updateJobPosting(@PathVariable Long jobPostingId,
+                                              @RequestBody JobPostingUpdateRequest request,
+                                              @AuthenticationPrincipal(expression = "member") Member member) {
+        jobPostingFacade.updateJobPosting(jobPostingId, request, member);
+
+        return ResponseEntity.ok(CommonResponse.success());
     }
 }
