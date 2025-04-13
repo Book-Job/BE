@@ -2,12 +2,11 @@ package com.bookjob.job.dto.request;
 
 import java.time.LocalDateTime;
 
-public record JobPostingCreateRequest(
+public record JobPostingUpdateRequest(
         String title,
         String text,
         String jobCategory,
         String employmentType,
-        String nickname,
         String websiteUrl,
         String location,
         int experienceMin,

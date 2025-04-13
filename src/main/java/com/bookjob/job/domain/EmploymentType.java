@@ -9,7 +9,7 @@ public enum EmploymentType {
         try {
             return EmploymentType.valueOf(value.toUpperCase());
         } catch (IllegalArgumentException e) {
-            throw BadRequestException.invalidEmployType(value);
+            throw BadRequestException.invalidEnumValue(value, EmploymentType.class);
         }
     }
 }

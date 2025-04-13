@@ -32,7 +32,7 @@ class JobCategoryTest {
             // when & then
             assertThatThrownBy(() -> JobCategory.fromString(invalidJobCategoryStr))
                     .isInstanceOf(BadRequestException.class)
-                    .hasMessage(BadRequestException.invalidJobCategory(invalidJobCategoryStr).getMessage());
+                    .hasMessage(BadRequestException.invalidEnumValue(invalidJobCategoryStr, JobCategory.class).getMessage());
         }
     }
 }
