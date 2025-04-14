@@ -88,4 +88,12 @@ public class JobPosting extends SoftDeleteEntity {
         this.jobCategory = jobCategory;
         this.location = location;
     }
+
+    public void incrementViewCount() {
+        if (this.viewCount == null) {
+            this.viewCount = 1;
+        } else {
+            this.viewCount++;
+        }
+    }
 }
