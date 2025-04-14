@@ -10,6 +10,8 @@ public class NotFoundException extends BaseException {
     static private final String MEMBER_NOT_FOUND = "회원을 찾을 수 없습니다.";
     static private final String JOB_POSTING_NOT_FOUND = "구인 글을 찾을 수 없습니다.";
     static private final String JOB_SEEKING_NOT_FOUND = "구직 글을 찾을 수 없습니다.";
+    static private final String BOOKMARK_NOT_FOUND = "스크랩을 찾을 수 없습니다.";
+    static private final String BOOKMARK_TARGET_NOT_FOUND = "스크랩 대상을 찾을 수 없습니다.";
 
     public NotFoundException(String message) {
         super(message, HttpStatus.NOT_FOUND);
@@ -42,5 +44,13 @@ public class NotFoundException extends BaseException {
 
     public static NotFoundException jobSeekingNotFound() {
         return new NotFoundException(JOB_SEEKING_NOT_FOUND);
+    }
+
+    public static NotFoundException bookMarkNotFound() {
+        return new NotFoundException(BOOKMARK_NOT_FOUND);
+    }
+
+    public static NotFoundException bookMarkTargetNotFound() {
+        return new NotFoundException(BOOKMARK_TARGET_NOT_FOUND);
     }
 }
