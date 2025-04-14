@@ -57,6 +57,26 @@ public class JobSeeking extends SoftDeleteEntity {
     }
 
     public void incrementViewCount() {
-        this.viewCount++;
+        if (this.viewCount == null) {
+            this.viewCount = 1;
+        } else {
+            this.viewCount++;
+        }
+    }
+
+    public void update(
+            String title,
+            String text,
+            EmploymentType employmentType,
+            JobCategory jobCategory,
+            String contactEmail,
+            String experience
+    ) {
+        this.title = title;
+        this.text = text;
+        this.employmentType = employmentType;
+        this.jobCategory = jobCategory;
+        this.contactEmail = contactEmail;
+        this.experience = experience;
     }
 }
