@@ -35,6 +35,8 @@ public class JobPostingReadService {
                 NotFoundException::jobPostingNotFound
         );
 
+        jobPosting.incrementViewCount();
+
         return new JobPostingDetailsResponse(
                 jobPosting.getId(),
                 jobPosting.getNickname(),
