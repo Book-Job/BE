@@ -59,4 +59,9 @@ public class JobPostingController {
 
         return ResponseEntity.ok(CommonResponse.success(response));
     }
+
+    @GetMapping("/best")
+    public ResponseEntity<?> getJobPostingBest() {
+        return ResponseEntity.ok(CommonResponse.success(jobPostingFacade.getJobPostingBest()));
+    }
 }
