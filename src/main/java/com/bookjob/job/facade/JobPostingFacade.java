@@ -1,15 +1,24 @@
 package com.bookjob.job.facade;
 
+import com.bookjob.job.domain.JobPosting;
 import com.bookjob.job.domain.JobPostingOrder;
 import com.bookjob.job.dto.request.JobPostingCreateRequest;
 import com.bookjob.job.dto.request.JobPostingUpdateRequest;
 import com.bookjob.job.dto.response.CursorJobPostingResponse;
+import com.bookjob.job.dto.response.JobPostingBestResponse;
 import com.bookjob.job.dto.response.JobPostingDetailsResponse;
 import com.bookjob.job.service.JobPostingReadService;
 import com.bookjob.job.service.JobPostingWriteService;
 import com.bookjob.member.domain.Member;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Component;
+
+import java.time.LocalDateTime;
+import java.util.List;
 
 @Component
 @RequiredArgsConstructor
@@ -38,5 +47,9 @@ public class JobPostingFacade {
 
     public JobPostingDetailsResponse getJobPostingDetails(Long id) {
         return jobPostingReadService.getJobPostingDetails(id);
+    }
+
+    public List<JobPostingBestResponse> getJobPostingBest() {
+        return jobPostingReadService.getJobPostingBest();
     }
 }
