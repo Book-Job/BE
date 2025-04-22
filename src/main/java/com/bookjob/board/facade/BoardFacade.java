@@ -2,6 +2,7 @@ package com.bookjob.board.facade;
 
 import com.bookjob.board.dto.request.BoardCreateRequest;
 import com.bookjob.board.dto.request.BoardUpdateRequest;
+import com.bookjob.board.dto.response.BoardBestResponse;
 import com.bookjob.board.dto.response.BoardDetailResponse;
 import com.bookjob.board.dto.response.CursorBoardResponse;
 import com.bookjob.board.service.BoardReadService;
@@ -9,6 +10,8 @@ import com.bookjob.board.service.BoardWriteService;
 import com.bookjob.member.domain.Member;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
+
+import java.util.List;
 
 @Component
 @RequiredArgsConstructor
@@ -35,5 +38,9 @@ public class BoardFacade {
 
     public BoardDetailResponse getBoardDetail(Long boardId) {
         return boardReadService.getBoardDetails(boardId);
+    }
+
+    public List<BoardBestResponse> getBoardBest() {
+        return boardReadService.getBoardBest();
     }
 }

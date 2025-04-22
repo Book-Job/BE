@@ -60,4 +60,8 @@ public class BoardController {
         return ResponseEntity.ok(CommonResponse.success(res));
     }
 
+    @GetMapping("/best")
+    public ResponseEntity<?> getBoardBest() {
+        return ResponseEntity.ok(CommonResponse.success(boardFacade.getBoardBest()));
+    }
 }

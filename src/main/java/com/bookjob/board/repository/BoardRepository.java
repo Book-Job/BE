@@ -3,10 +3,13 @@ package com.bookjob.board.repository;
 import com.bookjob.board.domain.Board;
 import com.bookjob.board.dto.response.BoardDetailResponse;
 import com.bookjob.member.dto.MyPostingsInBoard;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -26,4 +29,12 @@ public interface BoardRepository extends JpaRepository<Board, Long> {
             b.memberId = :memberId
             """)
     List<MyPostingsInBoard> findMyPostingsByMemberId(Long memberId);
+
+    @Query("""
+            SELECT b
+            FROM Board b
+            WHERE b.createdAt >= :since
+            AND b.deletedAt is null
+            """)
+    Page<Board> findRecentPosts(@Param("since") LocalDateTime since, Pageable pageable);
 }
