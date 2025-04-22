@@ -9,6 +9,7 @@ import com.bookjob.board.dto.response.CursorBoardResponse;
 import com.bookjob.board.repository.BoardQueryRepository;
 import com.bookjob.board.repository.BoardRepository;
 import com.bookjob.common.exception.NotFoundException;
+import com.bookjob.common.utils.BestPostingUtil;
 import com.bookjob.member.domain.Member;
 import com.bookjob.member.dto.MyPostingsInBoard;
 import com.bookjob.member.dto.MyPostingsInBoardResponse;
@@ -74,7 +75,7 @@ public class BoardReadService {
                 .map(board -> new BoardScore(board, calculateScore(board)))
                 .sorted(Comparator.comparing(BoardScore::score).reversed())
                 .limit(10)
-                .map(bs -> new BoardBestResponse(bs.board().getTitle(), bs.board().getCommentCount()))
+                .map(boardScore -> new BoardBestResponse(boardScore.board()))
                 .toList();
     }
 
@@ -86,7 +87,7 @@ public class BoardReadService {
      * - 랜덤 요소 (예측을 어렵게 하기 위한 0.0 ~ 1.0 사이의 랜덤 점수 부여)
      */
     private double calculateScore(Board board) {
-        double timeScore = timeDecayScore(board.getCreatedAt());
+        double timeScore =  BestPostingUtil.timeDecayScore(board.getCreatedAt());
         double randomFactor = ThreadLocalRandom.current().nextDouble(0.0, 1.0);
         long viewCount = Optional.ofNullable(board.getViewCount()).orElse(0L);
         long commentCount = Optional.ofNullable(board.getCommentCount()).orElse(0L);
@@ -95,13 +96,5 @@ public class BoardReadService {
                 + commentCount * 5.0
                 + timeScore
                 + randomFactor;
-    }
-
-    /**
-     * 작성 시간이 오래될수록 점수가 줄어드는 시간 감점 점수 계산
-     */
-    private double timeDecayScore(LocalDateTime createdAt) {
-        long hoursAgo = Duration.between(createdAt, LocalDateTime.now()).toHours();
-        return Math.max(0, 20 - hoursAgo * 0.5);
     }
 }
