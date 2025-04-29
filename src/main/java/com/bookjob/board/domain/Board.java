@@ -24,8 +24,7 @@ public class Board extends SoftDeleteEntity {
     @Column(nullable = false)
     private String title;
 
-    @Lob
-    @Column(nullable = false)
+    @Column(columnDefinition = "TEXT")
     private String text;
 
     @Column(nullable = false)
