@@ -1,5 +1,7 @@
 package com.bookjob.auth.filter;
 
+import com.bookjob.auth.dto.LoginResponse;
+import com.bookjob.auth.dto.MemberDetailsDto;
 import com.bookjob.auth.dto.MemberPasswordLoginRequest;
 import com.bookjob.auth.utils.JwtProvider;
 import com.bookjob.common.dto.CommonResponse;
@@ -15,12 +17,9 @@ import org.springframework.security.authentication.AuthenticationServiceExceptio
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
-import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 import java.io.IOException;
-import java.util.List;
 
 public class JwtLoginFilter extends UsernamePasswordAuthenticationFilter {
 
@@ -52,15 +51,14 @@ public class JwtLoginFilter extends UsernamePasswordAuthenticationFilter {
 
     @Override
     protected void successfulAuthentication(HttpServletRequest request, HttpServletResponse response, FilterChain chain, Authentication authResult) throws IOException {
-        UserDetails userDetails = (UserDetails) authResult.getPrincipal();
-        String username = userDetails.getUsername();
-        List<? extends GrantedAuthority> roles = userDetails.getAuthorities().stream().toList();
+        MemberDetailsDto userDetails = (MemberDetailsDto) authResult.getPrincipal();
+        LoginResponse loginResponse = new LoginResponse(userDetails.member().getNickname(), userDetails.getUsername());
 
-        String token = jwtProvider.createToken(username, roles.getFirst().getAuthority());
+        String token = jwtProvider.createToken(loginResponse);
 
         response.addHeader(HttpHeaders.AUTHORIZATION, token);
 
-        CommonResponse<?> successResponse = CommonResponse.success();
+        CommonResponse<?> successResponse = CommonResponse.success(loginResponse);
         ServletResponseUtil.servletResponse(response, successResponse, HttpStatus.OK);
     }
 
