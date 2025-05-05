@@ -8,6 +8,8 @@ import com.bookjob.board.dto.response.CursorBoardResponse;
 import com.bookjob.board.service.BoardReadService;
 import com.bookjob.board.service.BoardWriteService;
 import com.bookjob.member.domain.Member;
+import com.bookjob.member.dto.request.BoardIdsRequest;
+import com.bookjob.member.dto.response.MyPostingsInBoardResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
@@ -42,5 +44,13 @@ public class BoardFacade {
 
     public List<BoardBestResponse> getBoardBest() {
         return boardReadService.getBoardBest();
+    }
+
+    public MyPostingsInBoardResponse getMyPostingsInBoard(Member member) {
+        return boardReadService.getMyPostingsInBoard(member);
+    }
+
+    public void deleteMyPostingsInBoard(Member member, BoardIdsRequest request) {
+        boardWriteService.deleteMyPostingsInBoard(member, request);
     }
 }

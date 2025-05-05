@@ -1,6 +1,7 @@
 package com.bookjob.job.domain;
 
 import com.bookjob.common.domain.SoftDeleteEntity;
+import com.bookjob.common.exception.BadRequestException;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Builder;
@@ -78,5 +79,12 @@ public class JobSeeking extends SoftDeleteEntity {
         this.jobCategory = jobCategory;
         this.contactEmail = contactEmail;
         this.experience = experience;
+    }
+
+    public void softDelete() {
+        if (this.getDeletedAt() != null) {
+            throw BadRequestException.JobSeekingAlreadyDeleted();
+        }
+        this.delete();
     }
 }

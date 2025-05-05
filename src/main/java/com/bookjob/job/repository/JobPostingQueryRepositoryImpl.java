@@ -1,6 +1,7 @@
 package com.bookjob.job.repository;
 
 import com.bookjob.job.domain.JobPostingOrder;
+import com.bookjob.job.dto.application.MyPostingsInRecruitment;
 import com.bookjob.job.dto.response.JobPostingPreviewResponse;
 import com.bookjob.jooq.generated.tables.JobPosting;
 import lombok.RequiredArgsConstructor;
@@ -14,6 +15,9 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
+
+import static com.bookjob.jooq.generated.Tables.JOB_POSTING;
+import static com.bookjob.jooq.generated.Tables.JOB_SEEKING;
 
 @Repository
 @RequiredArgsConstructor
@@ -102,6 +106,38 @@ public class JobPostingQueryRepositoryImpl implements JobPostingQueryRepository 
                 .where(jp.ID.in(sortedIds))
                 .orderBy(DSL.field("FIND_IN_SET({0}, {1})", Integer.class, jp.ID, idListStr))
                 .fetchInto(JobPostingPreviewResponse.class);
+    }
+
+    @Override
+    public List<MyPostingsInRecruitment> findMyPostingsByMemberId(Long memberId, int page, int limit) {
+        return dslContext.select(
+                        DSL.field("recruitmentId", Long.class),
+                        DSL.field("title", String.class),
+                        DSL.field("created_at", LocalDateTime.class),
+                        DSL.field("recruitmentCategory", String.class)
+                )
+                .from(DSL.select(
+                                JOB_POSTING.ID.as("recruitmentId"),
+                                JOB_POSTING.TITLE,
+                                JOB_POSTING.CREATED_AT,
+                                DSL.inline("JOB_POSTING").as("recruitmentCategory"))
+                        .from(JOB_POSTING)
+                        .where(JOB_POSTING.DELETED_AT.isNull()
+                                .and(JOB_POSTING.MEMBER_ID.eq(memberId)))
+                        .unionAll(
+                                DSL.select(
+                                            JOB_SEEKING.ID.as("recruitmentId"),
+                                            JOB_SEEKING.TITLE,
+                                            JOB_SEEKING.CREATED_AT,
+                                            DSL.inline("JOB_SEEKING").as("recruitmentCategory"))
+                                        .from(JOB_SEEKING)
+                                        .where(JOB_SEEKING.DELETED_AT.isNull()
+                                                .and(JOB_SEEKING.MEMBER_ID.eq(memberId)))
+                        )
+                )
+                .offset(page)
+                .limit(limit)
+                .fetchInto(MyPostingsInRecruitment.class);
     }
 
     private Condition getKeysetPaginationCondition(JobPostingOrder order,

@@ -77,7 +77,7 @@ public class JobPostingWriteService {
             throw ForbiddenException.forbidden();
         }
 
-        jobPostingRepository.delete(jobPosting);
+        jobPosting.softDelete();
     }
 
     @MemberDataCleanup

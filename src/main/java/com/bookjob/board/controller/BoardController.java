@@ -7,6 +7,8 @@ import com.bookjob.board.dto.response.CursorBoardResponse;
 import com.bookjob.board.facade.BoardFacade;
 import com.bookjob.common.dto.CommonResponse;
 import com.bookjob.member.domain.Member;
+import com.bookjob.member.dto.request.BoardIdsRequest;
+import com.bookjob.member.dto.response.MyPostingsInBoardResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -63,5 +65,21 @@ public class BoardController {
     @GetMapping("/best")
     public ResponseEntity<?> getBoardBest() {
         return ResponseEntity.ok(CommonResponse.success(boardFacade.getBoardBest()));
+    }
+
+    /**
+     * 내가 쓴 자유게시판 조회 및 선택 삭제
+     */
+    @GetMapping("/members")
+    public ResponseEntity<?> getMyPostingsInBoard(@AuthenticationPrincipal(expression = "member") Member member) {
+        MyPostingsInBoardResponse myPostingsInBoardResponse = boardFacade.getMyPostingsInBoard(member);
+        return ResponseEntity.ok(CommonResponse.success(myPostingsInBoardResponse));
+    }
+
+    @DeleteMapping("/members")
+    public ResponseEntity<?> deleteMyPostingsInBoard(@AuthenticationPrincipal(expression = "member") Member member,
+                                                     @Valid @RequestBody BoardIdsRequest request) {
+        boardFacade.deleteMyPostingsInBoard(member, request);
+        return ResponseEntity.ok(CommonResponse.success());
     }
 }
