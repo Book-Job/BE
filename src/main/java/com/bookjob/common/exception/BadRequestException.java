@@ -12,6 +12,7 @@ public class BadRequestException extends BaseException {
     static private final String INVALID_ENUM_VALUE = "유효하지 않은 값입니다.: {%s}, 유효한 값: {%s}";
     static private final String JOB_POSTING_ALREADY_DELETED = "이미 삭제된 구인 글입니다.";
     static private final String JOB_SEEKING_ALREADY_DELETED = "이미 삭제된 구직 글입니다.";
+    static private final String PASSWORD_MISSMATCH = "비밀번호가 일치하지 않습니다.";
 
     public BadRequestException(String message) {
         super(message, HttpStatus.BAD_REQUEST);
@@ -45,5 +46,9 @@ public class BadRequestException extends BaseException {
 
     public static BadRequestException JobSeekingAlreadyDeleted() {
         return new BadRequestException(JOB_SEEKING_ALREADY_DELETED);
+    }
+
+    public static BadRequestException passwordMissmatch() {
+        return new BadRequestException(PASSWORD_MISSMATCH);
     }
 }

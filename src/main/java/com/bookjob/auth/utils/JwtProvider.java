@@ -1,5 +1,6 @@
 package com.bookjob.auth.utils;
 
+import com.bookjob.auth.dto.LoginResponse;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.Jws;
@@ -27,12 +28,12 @@ public class JwtProvider {
         this.key = Keys.hmacShaKeyFor(keyBytes);
     }
 
-    public String createToken(String email, String role) {
+    public String createToken(LoginResponse response) {
         return BEARER_PREFIX + Jwts.builder()
-                .subject(email)
+                .subject(response.loginId())
                 .issuedAt(Date.from(Instant.now()))
                 .expiration(Date.from(Instant.now().plusMillis(expireTime)))
-                .claim("role", role)
+                .claim("nickname", response.nickname())
                 .signWith(key)
                 .compact();
     }
@@ -70,8 +71,8 @@ public class JwtProvider {
         try {
             Jws<Claims> claims = parseToken(refreshToken);
             String loginId = claims.getPayload().getSubject();
-            String role = claims.getPayload().get("role").toString();
-            return createToken(loginId, role);
+            String nickname = claims.getPayload().get("nickname").toString();
+            return createToken(new LoginResponse(nickname, loginId));
         } catch (Exception e) {
             throw new SecurityException("Invalid refresh token");
         }

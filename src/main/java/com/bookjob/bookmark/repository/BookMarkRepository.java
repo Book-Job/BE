@@ -7,4 +7,6 @@ import java.util.List;
 
 public interface BookMarkRepository extends JpaRepository<BookMark, Long> {
     List<BookMark> findByMemberId(Long id);
+
+    void deleteAllByMemberId(Long memberId);
 }

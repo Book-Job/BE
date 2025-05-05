@@ -1,5 +1,6 @@
 package com.bookjob.common.domain;
 
+import com.bookjob.common.config.TestJooqConfig;
 import com.bookjob.common.config.TestPasswordEncoderConfig;
 import com.bookjob.member.domain.Member;
 import com.bookjob.member.repository.MemberRepository;
@@ -14,7 +15,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 @DataJpaTest
-@Import(TestPasswordEncoderConfig.class)
+@Import({TestPasswordEncoderConfig.class, TestJooqConfig.class})
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
 public class SoftDeleteTest {
 

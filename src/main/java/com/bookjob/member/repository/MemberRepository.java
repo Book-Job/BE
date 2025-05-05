@@ -1,8 +1,8 @@
 package com.bookjob.member.repository;
 
 import com.bookjob.member.domain.Member;
-import com.bookjob.member.dto.MemberDetailResponse;
-import com.bookjob.member.dto.MyPageResponse;
+import com.bookjob.member.dto.response.MemberDetailResponse;
+import com.bookjob.member.dto.response.MyPageResponse;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
@@ -30,7 +30,7 @@ public interface MemberRepository extends JpaRepository<Member, Long> {
     String findEmailByLoginId(String loginId);
 
     @Query("""
-    select new com.bookjob.member.dto.MyPageResponse(
+    select new com.bookjob.member.dto.response.MyPageResponse(
     m.nickname, m.email)
     from Member m
     where m.id = :id
@@ -38,10 +38,10 @@ public interface MemberRepository extends JpaRepository<Member, Long> {
     MyPageResponse getMyPageById(Long id);
 
     @Query("""
-    select new com.bookjob.member.dto.MemberDetailResponse(
-    m.nickname, m.email, m.loginId)
-    from Member m
-    where m.id = :id
-    """)
+            select new com.bookjob.member.dto.response.MemberDetailResponse(
+            m.nickname, m.email, m.loginId)
+            from Member m
+            where m.id = :id
+            """)
     MemberDetailResponse getMemberDetailById(Long id);
 }

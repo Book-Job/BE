@@ -3,19 +3,33 @@ package com.bookjob.member.facade;
 import com.bookjob.auth.service.AuthService;
 import com.bookjob.board.service.BoardReadService;
 import com.bookjob.board.service.BoardWriteService;
+import com.bookjob.common.exception.BadRequestException;
 import com.bookjob.member.domain.Member;
-import com.bookjob.member.dto.*;
+import com.bookjob.member.dto.request.BoardIdsRequest;
+import com.bookjob.member.dto.request.MemberSignupRequest;
+import com.bookjob.member.dto.request.UpdateNicknameRequest;
+import com.bookjob.member.dto.response.MemberDetailResponse;
+import com.bookjob.member.dto.response.MyPageResponse;
+import com.bookjob.member.dto.response.MyPostingsInBoardResponse;
+import com.bookjob.member.event.MemberWithdrawalEvent;
 import com.bookjob.member.service.MemberReadService;
 import com.bookjob.member.service.MemberWriteService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
 @Component
 @RequiredArgsConstructor
 public class MemberFacade {
+    private final PasswordEncoder passwordEncoder;
     private final MemberWriteService memberWriteService;
     private final MemberReadService memberReadService;
     private final AuthService authService;
+    private final BoardReadService boardReadService;
+    private final BoardWriteService boardWriteService;
+    private final ApplicationEventPublisher eventPublisher;
 
     public void saveMember(MemberSignupRequest request) {
         memberWriteService.registerMember(request);
@@ -32,5 +46,24 @@ public class MemberFacade {
     public void updateNickname(Member member, UpdateNicknameRequest request) {
         authService.checkDuplicatedNickname(request.nickname());
         memberWriteService.updateNickname(member, request);
+    }
+
+    public MyPostingsInBoardResponse getMyPostingsInBoard(Member member) {
+        return boardReadService.getMyPostingsInBoard(member);
+    }
+
+    public void deleteMyPostingsInBoard(Member member, BoardIdsRequest request) {
+        boardWriteService.deleteMyPostingsInBoard(member, request);
+    }
+
+    @Transactional
+    public void withdrawMember(Member member, String password) {
+        if (!member.getPassword().matches(password, passwordEncoder)) {
+            throw BadRequestException.passwordMissmatch();
+        }
+
+        memberWriteService.deleteMember(member);
+
+        eventPublisher.publishEvent(new MemberWithdrawalEvent(this, member.getId()));
     }
 }

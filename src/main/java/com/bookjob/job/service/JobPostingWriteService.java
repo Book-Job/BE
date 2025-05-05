@@ -1,6 +1,5 @@
 package com.bookjob.job.service;
 
-import com.bookjob.common.exception.BadRequestException;
 import com.bookjob.common.exception.ForbiddenException;
 import com.bookjob.common.exception.NotFoundException;
 import com.bookjob.job.domain.EmploymentType;
@@ -9,6 +8,7 @@ import com.bookjob.job.domain.JobPosting;
 import com.bookjob.job.dto.request.JobPostingCreateRequest;
 import com.bookjob.job.dto.request.JobPostingUpdateRequest;
 import com.bookjob.job.repository.JobPostingRepository;
+import com.bookjob.member.annotation.MemberDataCleanup;
 import com.bookjob.member.domain.Member;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -78,5 +78,10 @@ public class JobPostingWriteService {
         }
 
         jobPosting.softDelete();
+    }
+
+    @MemberDataCleanup
+    public void deleteJobPosting(Long memberId) {
+        jobPostingRepository.deleteAllByMemberId(memberId);
     }
 }

@@ -3,8 +3,8 @@ package com.bookjob.member.service;
 import com.bookjob.common.domain.Password;
 import com.bookjob.common.exception.NotFoundException;
 import com.bookjob.member.domain.Member;
-import com.bookjob.member.dto.MemberSignupRequest;
-import com.bookjob.member.dto.UpdateNicknameRequest;
+import com.bookjob.member.dto.request.MemberSignupRequest;
+import com.bookjob.member.dto.request.UpdateNicknameRequest;
 import com.bookjob.member.repository.MemberRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -36,5 +36,9 @@ public class MemberWriteService {
                 NotFoundException::memberNotFound
         );
         foundMember.updateNickname(request.nickname());
+    }
+
+    public void deleteMember(Member member) {
+        memberRepository.delete(member);
     }
 }

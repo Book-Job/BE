@@ -4,12 +4,11 @@ import com.bookjob.common.exception.ForbiddenException;
 import com.bookjob.common.exception.NotFoundException;
 import com.bookjob.job.domain.EmploymentType;
 import com.bookjob.job.domain.JobCategory;
-import com.bookjob.job.domain.JobPosting;
 import com.bookjob.job.domain.JobSeeking;
-import com.bookjob.job.dto.request.JobPostingUpdateRequest;
 import com.bookjob.job.dto.request.JobSeekingCreateRequest;
 import com.bookjob.job.dto.request.JobSeekingUpdateRequest;
 import com.bookjob.job.repository.JobSeekingRepository;
+import com.bookjob.member.annotation.MemberDataCleanup;
 import com.bookjob.member.domain.Member;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -46,7 +45,9 @@ public class JobSeekingWriteService {
 
         JobSeeking jobSeeking = jobSeekingRepository.findById(id).orElseThrow(NotFoundException::jobSeekingNotFound);
 
-        if (!jobSeeking.getMemberId().equals(member.getId())) {throw ForbiddenException.forbidden();}
+        if (!jobSeeking.getMemberId().equals(member.getId())) {
+            throw ForbiddenException.forbidden();
+        }
 
         jobSeeking.update(
                 request.title(),
@@ -66,5 +67,10 @@ public class JobSeekingWriteService {
         }
 
         jobSeeking.softDelete();
+    }
+
+    @MemberDataCleanup
+    public void deleteJobSeeking(Long memberId) {
+        jobSeekingRepository.deleteAllByMemberId(memberId);
     }
 }

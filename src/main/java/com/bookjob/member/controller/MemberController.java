@@ -2,7 +2,13 @@ package com.bookjob.member.controller;
 
 import com.bookjob.common.dto.CommonResponse;
 import com.bookjob.member.domain.Member;
-import com.bookjob.member.dto.*;
+import com.bookjob.member.dto.request.BoardIdsRequest;
+import com.bookjob.member.dto.request.DeleteMemberRequest;
+import com.bookjob.member.dto.request.MemberSignupRequest;
+import com.bookjob.member.dto.request.UpdateNicknameRequest;
+import com.bookjob.member.dto.response.MemberDetailResponse;
+import com.bookjob.member.dto.response.MyPageResponse;
+import com.bookjob.member.dto.response.MyPostingsInBoardResponse;
 import com.bookjob.member.facade.MemberFacade;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -39,6 +45,26 @@ public class MemberController {
     public ResponseEntity<?> updateNickname(@AuthenticationPrincipal(expression = "member") Member member,
                                             @Valid @RequestBody UpdateNicknameRequest request) {
         memberFacade.updateNickname(member, request);
+        return ResponseEntity.ok(CommonResponse.success());
+    }
+
+    @GetMapping("/boards")
+    public ResponseEntity<?> getMyPostingsInBoard(@AuthenticationPrincipal(expression = "member") Member member) {
+        MyPostingsInBoardResponse myPostingsInBoardResponse = memberFacade.getMyPostingsInBoard(member);
+        return ResponseEntity.ok(CommonResponse.success(myPostingsInBoardResponse));
+    }
+
+    @DeleteMapping("/boards")
+    public ResponseEntity<?> deleteMyPostingsInBoard(@AuthenticationPrincipal(expression = "member") Member member,
+                                                     @Valid @RequestBody BoardIdsRequest request) {
+        memberFacade.deleteMyPostingsInBoard(member, request);
+        return ResponseEntity.ok(CommonResponse.success());
+    }
+
+    @DeleteMapping
+    public ResponseEntity<?> withdrawMember(@AuthenticationPrincipal(expression = "member") Member member,
+                                            @Valid @RequestBody DeleteMemberRequest request) {
+        memberFacade.withdrawMember(member, request.password());
         return ResponseEntity.ok(CommonResponse.success());
     }
 }

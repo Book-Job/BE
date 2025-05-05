@@ -18,4 +18,6 @@ public interface CommentRepository extends JpaRepository<Comment, Long> {
             LIMIT :limit
             """)
     List<CommentResponse> findCommentByBoardId(@Param("boardId") Long boardId, @Param("cursorId") Long cursorId, int limit);
+
+    void deleteAllByMemberId(Long memberId);
 }
