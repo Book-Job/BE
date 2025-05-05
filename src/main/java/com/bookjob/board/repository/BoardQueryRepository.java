@@ -22,7 +22,7 @@ public class BoardQueryRepository {
 
         return dslContext
                 .select(
-                        b.ID,
+                        b.ID.as("boardId"),
                         b.TITLE,
                         b.TEXT,
                         b.NICKNAME,
