@@ -61,8 +61,10 @@ public class JobSeekingWriteService {
     public void deleteJobSeeking(Long id, Member member) {
         JobSeeking jobSeeking = jobSeekingRepository.findById(id).orElseThrow(NotFoundException::jobSeekingNotFound);
 
-        if (!jobSeeking.getMemberId().equals(member.getId())) {throw ForbiddenException.forbidden();}
+        if (!jobSeeking.getMemberId().equals(member.getId())) {
+            throw ForbiddenException.forbidden();
+        }
 
-        jobSeekingRepository.delete(jobSeeking);
+        jobSeeking.softDelete();
     }
 }
