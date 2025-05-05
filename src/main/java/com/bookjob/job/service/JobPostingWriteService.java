@@ -8,6 +8,7 @@ import com.bookjob.job.domain.JobPosting;
 import com.bookjob.job.dto.request.JobPostingCreateRequest;
 import com.bookjob.job.dto.request.JobPostingUpdateRequest;
 import com.bookjob.job.repository.JobPostingRepository;
+import com.bookjob.member.annotation.MemberDataCleanup;
 import com.bookjob.member.domain.Member;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -77,5 +78,10 @@ public class JobPostingWriteService {
         }
 
         jobPostingRepository.delete(jobPosting);
+    }
+
+    @MemberDataCleanup
+    public void deleteJobPosting(Long memberId) {
+        jobPostingRepository.deleteAllByMemberId(memberId);
     }
 }

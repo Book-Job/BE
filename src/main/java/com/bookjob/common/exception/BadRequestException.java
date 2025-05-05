@@ -9,6 +9,7 @@ public class BadRequestException extends BaseException {
     static private final String VERIFICATION_CODE_EXPIRED = "인증 시간이 초과되었습니다.";
     static private final String INVALID_VERIFICATION_CODE = "인증 번호가 일치하지 않습니다.";
     static private final String INVALID_ENUM_VALUE = "유효하지 않은 값입니다.: {%s}, 유효한 값: {%s}";
+    static private final String PASSWORD_MISSMATCH = "비밀번호가 일치하지 않습니다.";
 
     public BadRequestException(String message) {
         super(message, HttpStatus.BAD_REQUEST);
@@ -29,5 +30,9 @@ public class BadRequestException extends BaseException {
 
         String message = String.format(INVALID_ENUM_VALUE, value, validValues);
         return new BadRequestException(message);
+    }
+
+    public static BadRequestException passwordMissmatch() {
+        return new BadRequestException(PASSWORD_MISSMATCH);
     }
 }

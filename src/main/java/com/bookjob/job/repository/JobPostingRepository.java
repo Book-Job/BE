@@ -17,4 +17,6 @@ public interface JobPostingRepository extends JpaRepository<JobPosting, Long>, J
               AND j.deletedAt is null
             """)
     Page<JobPosting> findRecentPosts(@Param("since") LocalDateTime since, Pageable pageable);
+
+    void deleteAllByMemberId(Long memberId);
 }

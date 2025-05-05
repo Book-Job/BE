@@ -6,6 +6,7 @@ import com.bookjob.comment.dto.request.CommentUpdateRequest;
 import com.bookjob.comment.repository.CommentRepository;
 import com.bookjob.common.exception.ForbiddenException;
 import com.bookjob.common.exception.NotFoundException;
+import com.bookjob.member.annotation.MemberDataCleanup;
 import com.bookjob.member.domain.Member;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -54,5 +55,10 @@ public class CommentWriteService {
         }
 
         comment.delete();
+    }
+
+    @MemberDataCleanup
+    public void deleteComment(Long memberId) {
+        commentRepository.deleteAllByMemberId(memberId);
     }
 }
