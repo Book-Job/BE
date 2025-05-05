@@ -12,7 +12,7 @@ import com.bookjob.common.exception.NotFoundException;
 import com.bookjob.common.utils.BestPostingUtil;
 import com.bookjob.member.domain.Member;
 import com.bookjob.member.dto.MyPostingsInBoard;
-import com.bookjob.member.dto.MyPostingsInBoardResponse;
+import com.bookjob.member.dto.response.MyPostingsInBoardResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -21,7 +21,6 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.Comparator;
 import java.util.List;
