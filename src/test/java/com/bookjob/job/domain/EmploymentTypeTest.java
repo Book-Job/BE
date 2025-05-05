@@ -31,7 +31,7 @@ class EmploymentTypeTest {
             // when & then
             assertThatThrownBy(() -> EmploymentType.fromString(invalidType))
                     .isInstanceOf(BadRequestException.class)
-                    .hasMessage(BadRequestException.invalidEmployType(invalidType).getMessage());
+                    .hasMessage(BadRequestException.invalidEnumValue(invalidType, EmploymentType.class).getMessage());
         }
     }
 }

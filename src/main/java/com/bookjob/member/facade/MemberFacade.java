@@ -16,8 +16,6 @@ public class MemberFacade {
     private final MemberWriteService memberWriteService;
     private final MemberReadService memberReadService;
     private final AuthService authService;
-    private final BoardReadService boardReadService;
-    private final BoardWriteService boardWriteService;
 
     public void saveMember(MemberSignupRequest request) {
         memberWriteService.registerMember(request);
@@ -34,13 +32,5 @@ public class MemberFacade {
     public void updateNickname(Member member, UpdateNicknameRequest request) {
         authService.checkDuplicatedNickname(request.nickname());
         memberWriteService.updateNickname(member, request);
-    }
-
-    public MyPostingsInBoardResponse getMyPostingsInBoard(Member member) {
-        return boardReadService.getMyPostingsInBoard(member);
-    }
-
-    public void deleteMyPostingsInBoard(Member member, BoardIdsRequest request) {
-        boardWriteService.deleteMyPostingsInBoard(member, request);
     }
 }

@@ -41,17 +41,4 @@ public class MemberController {
         memberFacade.updateNickname(member, request);
         return ResponseEntity.ok(CommonResponse.success());
     }
-
-    @GetMapping("/boards")
-    public ResponseEntity<?> getMyPostingsInBoard(@AuthenticationPrincipal(expression = "member") Member member) {
-        MyPostingsInBoardResponse myPostingsInBoardResponse = memberFacade.getMyPostingsInBoard(member);
-        return ResponseEntity.ok(CommonResponse.success(myPostingsInBoardResponse));
-    }
-
-    @DeleteMapping("/boards")
-    public ResponseEntity<?> deleteMyPostingsInBoard(@AuthenticationPrincipal(expression = "member") Member member,
-                                                   @Valid @RequestBody BoardIdsRequest request) {
-        memberFacade.deleteMyPostingsInBoard(member, request);
-        return ResponseEntity.ok(CommonResponse.success());
-    }
 }

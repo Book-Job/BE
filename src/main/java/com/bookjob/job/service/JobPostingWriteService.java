@@ -1,5 +1,6 @@
 package com.bookjob.job.service;
 
+import com.bookjob.common.exception.BadRequestException;
 import com.bookjob.common.exception.ForbiddenException;
 import com.bookjob.common.exception.NotFoundException;
 import com.bookjob.job.domain.EmploymentType;
@@ -76,6 +77,6 @@ public class JobPostingWriteService {
             throw ForbiddenException.forbidden();
         }
 
-        jobPostingRepository.delete(jobPosting);
+        jobPosting.softDelete();
     }
 }
