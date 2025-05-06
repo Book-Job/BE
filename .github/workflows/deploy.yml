@@ -30,8 +30,7 @@ jobs:
 
       # 3. Gradle 실행 권한 부여
       - name: Grant execute permission for gradlew
-        working-directory: backend
-        run: chmod +x ./gradlew
+        run: chmod +x ./backend/gradlew
 
       # 4. Build 수행
       - name: Build
