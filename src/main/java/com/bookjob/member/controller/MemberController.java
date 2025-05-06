@@ -41,4 +41,11 @@ public class MemberController {
         memberFacade.updateNickname(member, request);
         return ResponseEntity.ok(CommonResponse.success());
     }
+
+    @GetMapping("/password")
+    public ResponseEntity<?> checkOriginalPassword(@AuthenticationPrincipal(expression = "member") Member member,
+                                                   @RequestBody @Valid OriginalPasswordRequest request) {
+        memberFacade.checkOriginalPassword(member.getId(), request);
+        return ResponseEntity.ok(CommonResponse.success());
+    }
 }

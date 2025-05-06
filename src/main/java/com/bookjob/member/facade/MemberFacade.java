@@ -3,6 +3,7 @@ package com.bookjob.member.facade;
 import com.bookjob.auth.service.AuthService;
 import com.bookjob.board.service.BoardReadService;
 import com.bookjob.board.service.BoardWriteService;
+import com.bookjob.common.exception.BadRequestException;
 import com.bookjob.member.domain.Member;
 import com.bookjob.member.dto.*;
 import com.bookjob.member.service.MemberReadService;
@@ -32,5 +33,11 @@ public class MemberFacade {
     public void updateNickname(Member member, UpdateNicknameRequest request) {
         authService.checkDuplicatedNickname(request.nickname());
         memberWriteService.updateNickname(member, request);
+    }
+
+    public void checkOriginalPassword(Long memberId, OriginalPasswordRequest request) {
+        if (!memberReadService.checkPasswordIsIdentical(memberId, request)) {
+            throw BadRequestException.passwordIsNotIdentical();
+        }
     }
 }
