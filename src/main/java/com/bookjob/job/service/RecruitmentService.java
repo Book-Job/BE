@@ -5,11 +5,12 @@ import com.bookjob.job.dto.response.MyPostingsInRecruitmentResponse;
 import com.bookjob.job.repository.JobPostingRepository;
 import com.bookjob.member.domain.Member;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.util.Collections;
-import java.util.List;
 
 @Service
 @Transactional(readOnly = true)
@@ -19,14 +20,11 @@ public class RecruitmentService {
     private final JobPostingRepository jobPostingRepository;
 
     public MyPostingsInRecruitmentResponse getMyPostingsInRecruitments(Member member, int page, int limit) {
-        List<MyPostingsInRecruitment> MyJobPostingsInRecruitment =
-                jobPostingRepository.findMyPostingsByMemberId(member.getId(), page, limit);
+        Pageable pageable = PageRequest.of(page, limit, Sort.by(Sort.Direction.DESC, "createdAt"));
+        Page<MyPostingsInRecruitment> MyJobPostingsInRecruitment =
+                jobPostingRepository.findMyPostingsByMemberId(member.getId(), pageable);
 
-        if (MyJobPostingsInRecruitment == null) {
-            MyJobPostingsInRecruitment = Collections.emptyList();
-        }
-
-        return new MyPostingsInRecruitmentResponse(MyJobPostingsInRecruitment);
+        return MyPostingsInRecruitmentResponse.of(MyJobPostingsInRecruitment);
     }
 
 }

@@ -9,10 +9,15 @@ import org.jooq.Condition;
 import org.jooq.DSLContext;
 import org.jooq.SortField;
 import org.jooq.impl.DSL;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Repository;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -109,8 +114,31 @@ public class JobPostingQueryRepositoryImpl implements JobPostingQueryRepository 
     }
 
     @Override
-    public List<MyPostingsInRecruitment> findMyPostingsByMemberId(Long memberId, int page, int limit) {
-        return dslContext.select(
+    public Page<MyPostingsInRecruitment> findMyPostingsByMemberId(Long memberId, Pageable pageable) {
+        int page = pageable.getPageNumber();
+        int limit = pageable. getPageSize();
+
+        int total = dslContext.fetchCount(
+                DSL.selectOne()
+                        .from(
+                                DSL.select(JOB_POSTING.ID)
+                                        .from(JOB_POSTING)
+                                        .where(JOB_POSTING.DELETED_AT.isNull()
+                                                .and(JOB_POSTING.MEMBER_ID.eq(memberId)))
+                                        .unionAll(
+                                                DSL.select(JOB_SEEKING.ID)
+                                                        .from(JOB_SEEKING)
+                                                        .where(JOB_SEEKING.DELETED_AT.isNull()
+                                                                .and(JOB_SEEKING.MEMBER_ID.eq(memberId)))
+                                        )
+                        )
+        );
+
+        if (total == 0) {
+            return new PageImpl<>(Collections.emptyList(), pageable, 0);
+        }
+
+        List<MyPostingsInRecruitment> list =  dslContext.select(
                         DSL.field("recruitmentId", Long.class),
                         DSL.field("title", String.class),
                         DSL.field("created_at", LocalDateTime.class),
@@ -135,9 +163,12 @@ public class JobPostingQueryRepositoryImpl implements JobPostingQueryRepository 
                                                 .and(JOB_SEEKING.MEMBER_ID.eq(memberId)))
                         )
                 )
-                .offset(page)
+                .orderBy(DSL.field("created_at").desc())
+                .offset((long) page * limit)
                 .limit(limit)
                 .fetchInto(MyPostingsInRecruitment.class);
+
+        return new PageImpl<>(list, pageable, total);
     }
 
     private Condition getKeysetPaginationCondition(JobPostingOrder order,
