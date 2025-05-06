@@ -42,6 +42,13 @@ public class MemberController {
         return ResponseEntity.ok(CommonResponse.success());
     }
 
+    @DeleteMapping
+    public ResponseEntity<?> withdrawMember(@AuthenticationPrincipal(expression = "member") Member member,
+                                            @Valid @RequestBody DeleteMemberRequest request) {
+        memberFacade.withdrawMember(member, request.password());
+        return ResponseEntity.ok(CommonResponse.success());
+    }
+
     @GetMapping("/password")
     public ResponseEntity<?> checkOriginalPassword(@AuthenticationPrincipal(expression = "member") Member member,
                                                    @RequestBody @Valid OriginalPasswordRequest request) {

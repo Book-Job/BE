@@ -1,4 +1,6 @@
-package com.bookjob.member.dto;
+package com.bookjob.member.dto.response;
+
+import com.bookjob.member.dto.MyPostingsInBoard;
 
 import org.springframework.data.domain.Page;
 

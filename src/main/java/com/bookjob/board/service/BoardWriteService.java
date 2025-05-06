@@ -7,7 +7,7 @@ import com.bookjob.board.repository.BoardRepository;
 import com.bookjob.common.exception.ForbiddenException;
 import com.bookjob.common.exception.NotFoundException;
 import com.bookjob.member.domain.Member;
-import com.bookjob.member.dto.BoardIdsRequest;
+import com.bookjob.member.dto.request.BoardIdsRequest;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;

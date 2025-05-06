@@ -1,4 +1,4 @@
-package com.bookjob.member.dto;
+package com.bookjob.member.dto.request;
 
 import jakarta.validation.constraints.NotEmpty;
 

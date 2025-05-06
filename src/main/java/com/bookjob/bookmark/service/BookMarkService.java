@@ -10,6 +10,7 @@ import com.bookjob.common.exception.ForbiddenException;
 import com.bookjob.common.exception.NotFoundException;
 import com.bookjob.job.repository.JobPostingRepository;
 import com.bookjob.job.repository.JobSeekingRepository;
+import com.bookjob.member.annotation.MemberDataCleanup;
 import com.bookjob.member.domain.Member;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -51,7 +52,7 @@ public class BookMarkService {
         BookMark bookMark = bookMarkRepository.findById(id).orElseThrow(NotFoundException::bookMarkNotFound);
 
         if (!bookMark.getMemberId().equals(member.getId())) {
-           throw ForbiddenException.forbidden();
+            throw ForbiddenException.forbidden();
         }
 
         bookMarkRepository.delete(bookMark);
@@ -94,5 +95,10 @@ public class BookMarkService {
                 .filter(Objects::nonNull)
                 .toList();
         return new MyBookMarksListResponse(responses);
+    }
+
+    @MemberDataCleanup
+    public void deleteBookmark(Long memberId) {
+        bookMarkRepository.deleteAllByMemberId(memberId);
     }
 }

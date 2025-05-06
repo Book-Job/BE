@@ -12,7 +12,7 @@ import com.bookjob.common.exception.NotFoundException;
 import com.bookjob.common.utils.BestPostingUtil;
 import com.bookjob.member.domain.Member;
 import com.bookjob.member.dto.MyPostingsInBoard;
-import com.bookjob.member.dto.MyPostingsInBoardResponse;
+import com.bookjob.member.dto.response.MyPostingsInBoardResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;

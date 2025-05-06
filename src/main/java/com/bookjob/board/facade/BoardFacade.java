@@ -8,8 +8,8 @@ import com.bookjob.board.dto.response.CursorBoardResponse;
 import com.bookjob.board.service.BoardReadService;
 import com.bookjob.board.service.BoardWriteService;
 import com.bookjob.member.domain.Member;
-import com.bookjob.member.dto.BoardIdsRequest;
-import com.bookjob.member.dto.MyPostingsInBoardResponse;
+import com.bookjob.member.dto.request.BoardIdsRequest;
+import com.bookjob.member.dto.response.MyPostingsInBoardResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
