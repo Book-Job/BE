@@ -126,6 +126,7 @@ jobs:
           sleep 10
           echo "SSM 포트 포워딩 세션이 시작되었습니다."
 
+
       - name: Grant execute permission for gradlew
         run: chmod +x ./gradlew
 
@@ -136,6 +137,27 @@ jobs:
           DB_URL: "jdbc:mysql://localhost:3306/${{ secrets.DB_NAME }}"
           DB_USERNAME: ${{ secrets.DB_USERNAME }}
           DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
+
+      - name: Verify SSM Session Connection
+        run: |
+          echo "========== SSM 세션 로그 확인 ==========="
+          if [ -f ssm_session.log ]; then
+            cat ssm_session.log
+          else
+            echo "ssm_session.log 파일이 없습니다."
+          fi
+
+          echo "========== 로컬 포트 확인 ==========="
+          netstat -tuln | grep 3306 || echo "포트 3306이 리스닝 상태가 아닙니다."
+
+          echo "========== 연결 테스트 ==========="
+          nc -z localhost 3306
+          if [ $? -eq 0 ]; then
+            echo "localhost:3306 연결 성공"
+          else
+            echo "localhost:3306 연결 실패"
+          fi
+          echo "====================================="
 
       - name: Terminate SSM Session
         if: always()
