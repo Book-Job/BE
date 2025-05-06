@@ -3,6 +3,7 @@ package com.bookjob.member.controller;
 import com.bookjob.common.dto.CommonResponse;
 import com.bookjob.member.domain.Member;
 import com.bookjob.member.dto.OriginalPasswordRequest;
+import com.bookjob.member.dto.request.ChangePasswordRequest;
 import com.bookjob.member.dto.request.DeleteMemberRequest;
 import com.bookjob.member.dto.request.MemberSignupRequest;
 import com.bookjob.member.dto.request.UpdateNicknameRequest;
@@ -58,6 +59,13 @@ public class MemberController {
     public ResponseEntity<?> checkOriginalPassword(@AuthenticationPrincipal(expression = "member") Member member,
                                                    @RequestBody @Valid OriginalPasswordRequest request) {
         memberFacade.checkOriginalPassword(member.getId(), request);
+        return ResponseEntity.ok(CommonResponse.success());
+    }
+
+    @PostMapping("/password")
+    public ResponseEntity<?> changePassword(@AuthenticationPrincipal(expression = "member") Member member,
+                                                   @RequestBody @Valid ChangePasswordRequest request) {
+        memberFacade.changePassword(member.getId(), request);
         return ResponseEntity.ok(CommonResponse.success());
     }
 }

@@ -4,6 +4,7 @@ import com.bookjob.auth.service.AuthService;
 import com.bookjob.common.exception.BadRequestException;
 import com.bookjob.member.domain.Member;
 import com.bookjob.member.dto.OriginalPasswordRequest;
+import com.bookjob.member.dto.request.ChangePasswordRequest;
 import com.bookjob.member.dto.request.MemberSignupRequest;
 import com.bookjob.member.dto.request.UpdateNicknameRequest;
 import com.bookjob.member.dto.response.MemberDetailResponse;
@@ -58,5 +59,9 @@ public class MemberFacade {
         if (!memberReadService.checkPasswordIsIdentical(memberId, request)) {
             throw BadRequestException.passwordMissmatch();
         }
+    }
+
+    public void changePassword(Long id, ChangePasswordRequest request) {
+        memberWriteService.changePassword(id, request);
     }
 }
