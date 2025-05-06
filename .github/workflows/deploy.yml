@@ -34,7 +34,6 @@ jobs:
 
       # 4. Build 수행
       - name: Build
-        working-directory: backend
         env:
           DB_URL: ${{ secrets.DB_URL }}
           DB_USERNAME: ${{ secrets.DB_USERNAME }}
