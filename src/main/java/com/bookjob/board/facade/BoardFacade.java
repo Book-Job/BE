@@ -46,8 +46,8 @@ public class BoardFacade {
         return boardReadService.getBoardBest();
     }
 
-    public MyPostingsInBoardResponse getMyPostingsInBoard(Member member) {
-        return boardReadService.getMyPostingsInBoard(member);
+    public MyPostingsInBoardResponse getMyPostingsInBoard(Member member, int page, int limit) {
+        return boardReadService.getMyPostingsInBoard(member, page, limit);
     }
 
     public void deleteMyPostingsInBoard(Member member, BoardIdsRequest request) {
