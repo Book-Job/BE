@@ -1,97 +1,160 @@
-name: Build and Deploy to EC2 with Predefined Environment Variables
+name: Spring Boot CI/CD Pipeline
 
 on:
   push:
     branches:
-      - main
-      - dev
+      - '**'
+
   pull_request:
+    types: [closed]
     branches:
       - main
       - dev
-    types:
-      - closed
+      - 54-feature-cicd-파이프라인-구축
 
 jobs:
-  deploy:
+  build-and-test:
     runs-on: ubuntu-latest
-
     steps:
-      # 1. 코드 체크아웃
-      - name: Check out code
+      - name: Checkout code
         uses: actions/checkout@v3
 
-      # 2. Java 21 설치 (openjdk)
-      - name: Set up JDK 21
+      - name: Set up JDK
         uses: actions/setup-java@v3
         with:
-          java-version: 21
-          distribution: temurin
+          java-version: '21'
+          distribution: 'temurin'
+          cache: gradle
 
-      # 3. Gradle 실행 권한 부여
       - name: Grant execute permission for gradlew
         run: chmod +x ./gradlew
 
-      # 4. Build 수행
-      - name: Build
-        env:
-          DB_URL: ${{ secrets.DB_URL }}
-          DB_USERNAME: ${{ secrets.DB_USERNAME }}
-          DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
-        run: |
-          echo "Building the project..."
-          ./gradlew clean build -x test \
-            -DdbUrl=${{ secrets.DB_URL }} \
-            -DdbUsername=${{ secrets.DB_USERNAME }} \
-            -DdbPassword=${{ secrets.DB_PASSWORD }}
-          echo "Build completed successfully."
+      - name: Build and Test
+        run: ./gradlew clean build
 
-      # 5. EC2 배포 및 실행
-      - name: Deploy and Start Application on EC2-1
+  deploy:
+    if: github.event.pull_request.merged == true
+    needs: build-and-test
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Set up JDK
+        uses: actions/setup-java@v3
+        with:
+          java-version: '21'
+          distribution: 'temurin'
+          cache: gradle
+
+      - name: Grant execute permission for gradlew
+        run: chmod +x ./gradlew
+
+      - name: Build with Gradle
+        run: ./gradlew clean build
+
+      - name: Find Executable JAR
+        id: find-jar
+        run: |
+          JAR_FILE=$(find build/libs -name "*.jar" -not -name "*plain.jar" | head -n 1)
+          echo "jar_file=$JAR_FILE" >> $GITHUB_OUTPUT
+          echo "Found executable JAR: $JAR_FILE"
+
+      - name: Transfer JAR file to EC2
+        uses: appleboy/scp-action@master
+        with:
+          host: ${{ secrets.EC2_HOST }}
+          username: ubuntu
+          key: ${{ secrets.EC2_PEM_KEY }}
+          source: ${{ steps.find-jar.outputs.jar_file }}
+          target: "~/app"
+          strip_components: 2
+
+      - name: Deploy application to EC2
         uses: appleboy/ssh-action@master
         with:
-          host: ${{ secrets.HOST_PROD }}
+          host: ${{ secrets.EC2_HOST }}
           username: ubuntu
-          key: ${{ secrets.PRIVATE_KEY }}
+          key: ${{ secrets.EC2_PEM_KEY }}
           script: |
-            echo "Deploying application on EC2-1..."
-            mkdir -p /home/ubuntu/deployments
-            echo "Directory created successfully."
-
-            echo "Uploading JAR file to EC2..."
-            scp -i ~/.ssh/id_rsa backend/build/libs/backend-0.0.1-SNAPSHOT.jar ubuntu@${{ secrets.HOST_PROD }}:/home/ubuntu/deployments/
-
-            echo "Checking for existing application on EC2-1..."
-            if lsof -i:8080; then
-              PID=$(lsof -t -i:8080)
-              echo "Found process on port 8080 with PID: $PID. Stopping it..."
-              kill -9 $PID
-              sleep 5
-              echo "Application stopped successfully."
+            # 앱 디렉토리 확인
+            mkdir -p ~/app
+            cd ~/app
+            
+            # 8080 포트를 사용하는 프로세스 종료
+            PID=$(lsof -t -i:8080 || echo "")
+            
+            if [ -n "$PID" ]; then
+              echo "Stopping application running on port 8080 with PID: $PID"
+              kill $PID
+            
+              # 최대 20초까지 기다리며 프로세스가 종료되었는지 확인
+              COUNTER=0
+              while [ $COUNTER -lt 20 ] && ps -p $PID > /dev/null; do
+                echo "Waiting for application to stop... ($COUNTER/20)"
+                sleep 1
+                COUNTER=$((COUNTER+1))
+              done
+            
+              # 20초 후에도 종료되지 않으면 강제 종료
+              if ps -p $PID > /dev/null; then
+                echo "Force stopping application..."
+                kill -9 $PID
+                sleep 2
+              fi
+            
+              # 포트가 정상적으로 해제되었는지 확인
+              if lsof -t -i:8080 > /dev/null; then
+                echo "Warning: Port 8080 is still in use!"
+              else
+                echo "Port 8080 is now free"
+              fi
             else
-              echo "No application running on port 8080."
+              echo "No application running on port 8080"
             fi
+            
+            # 새 JAR 파일 찾기 (plain.jar 제외)
+            JAR_FILE=$(find . -name "*.jar" -not -name "*plain.jar" | sort -t '.' -k2,2 -r | head -n 1)
+            echo "Starting application with JAR file: $JAR_FILE"
+            
+            PROFILE="prod"
 
-            echo "Starting new application on EC2-1..."
-            nohup java \
-              -javaagent:/home/ubuntu/scouter/agent.java/scouter.agent.jar \
-              -Dscouter.config=/home/ubuntu/scouter/agent.java/conf/scouter.conf \
-              -Dspring.profiles.active=aws \
-              -Dspring.datasource.url=${{ secrets.DB_URL }} \
-              -Dspring.datasource.username=${{ secrets.DB_USERNAME }} \
-              -Dspring.datasource.password=${{ secrets.DB_PASSWORD }} \
-              -DJWT_SECRET=${{ secrets.JWT_SECRET}} \
-              -jar /home/ubuntu/deployments/backend-0.0.1-SNAPSHOT.jar > /home/ubuntu/deployments/app.log 2>&1 &
-            echo "Application started successfully on EC2-1."
-
-            echo "Sleeping for 30 seconds to allow the application to initialize..."
-            sleep 30
-
-            echo "Checking the log file..."
-            if [ -f /home/ubuntu/deployments/app.log ]; then
-              echo "Log file exists. Displaying the last 10 lines:"
-              tail -n 10 /home/ubuntu/deployments/app.log
+            echo "Using profile: $PROFILE"
+            
+            # 애플리케이션 실행 (환경 변수 설정)
+            nohup java -Xmx512m -Xms256m -jar $JAR_FILE \
+              --spring.profiles.active=$PROFILE \
+              --server.port=8080 \
+              --DB_URL=${{ secrets.DB_URL }} \
+              --DB_NAME=${{ secrets.DB_NAME }} \
+              --DB_USERNAME=${{ secrets.DB_USERNAME }} \
+              --DB_PASSWORD=${{ secrets.DB_PASSWORD }} \
+              --SMTP_HOST=${{ secrets.SMTP_HOST }} \
+              --SMTP_PORT=${{ secrets.SMTP_PORT }} \
+              --SMTP_USERNAME=${{ secrets.SMTP_USERNAME }} \
+              --SMTP_PASSWORD=${{ secrets.SMTP_PASSWORD }} \
+              --JWT_SECRET=${{ secrets.JWT_SECRET }} \
+              > app.log 2>&1 &
+            
+            # PID 파일 생성 (향후 종료를 위해)
+            echo $! > app.pid
+            
+            # 애플리케이션이 시작되었는지 확인
+            sleep 10
+            if ps -p $(cat app.pid) > /dev/null; then
+              echo "Application started successfully with PID: $(cat app.pid)"
+            
+              # 포트 열렸는지 확인
+              if lsof -t -i:8080 > /dev/null; then
+                echo "Application is listening on port 8080"
+              else
+                echo "Warning: Application started but not listening on port 8080!"
+                echo "Checking logs for errors:"
+                tail -n 50 app.log
+                exit 1
+              fi
             else
-              echo "Log file not found. Application might have failed to start."
+              echo "Application failed to start. Check app.log for details."
+              tail -n 50 app.log
               exit 1
             fi

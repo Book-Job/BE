@@ -70,8 +70,10 @@ jooq {
             generationTool {
                 jdbc {
                     driver = 'com.mysql.cj.jdbc.Driver'
-                    url = System.getenv('DB_URL') ?: 'jdbc:mysql://localhost:3306/bookjob'
-                    user = System.getenv('DB_USER') ?: 'root'
+                    url = (System.getenv('DB_URL') && System.getenv('DB_NAME')) ?
+                            System.getenv('DB_URL') + '/' + System.getenv('DB_NAME') :
+                            'jdbc:mysql://localhost:3306/bookjob'
+                    user = System.getenv('DB_USERNAME') ?: 'root'
                     password = System.getenv('DB_PASSWORD') ?: 'root1234'
                 }
 
