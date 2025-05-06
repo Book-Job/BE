@@ -115,4 +115,12 @@ tasks.named('test') {
 
 tasks.named('generateJooq').configure {
     allInputsDeclared = true
+
+    // DB_URL 확인을 위한 doFirst 추가
+    doFirst {
+        println "========== jOOQ DB_URL 확인 ==========="
+        def dbUrl = System.getenv('DB_URL')
+        println "DB_URL: ${dbUrl ?: '환경변수 없음'}"
+        println "======================================="
+    }
 }
