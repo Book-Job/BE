@@ -2,7 +2,12 @@ package com.bookjob.member.controller;
 
 import com.bookjob.common.dto.CommonResponse;
 import com.bookjob.member.domain.Member;
-import com.bookjob.member.dto.*;
+import com.bookjob.member.dto.OriginalPasswordRequest;
+import com.bookjob.member.dto.request.DeleteMemberRequest;
+import com.bookjob.member.dto.request.MemberSignupRequest;
+import com.bookjob.member.dto.request.UpdateNicknameRequest;
+import com.bookjob.member.dto.response.MemberDetailResponse;
+import com.bookjob.member.dto.response.MyPageResponse;
 import com.bookjob.member.facade.MemberFacade;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
