@@ -26,11 +26,59 @@ jobs:
           distribution: 'temurin'
           cache: gradle
 
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ secrets.AWS_REGION }}
+
+      - name: Install Session Manager Plugin
+        run: |
+          curl "https://s3.amazonaws.com/session-manager-downloads/plugin/latest/ubuntu_64bit/session-manager-plugin.deb" -o "session-manager-plugin.deb"
+          sudo dpkg -i session-manager-plugin.deb
+
+      - name: Extract RDS hostname from DB_URL
+        run: |
+          # DB_URL에서 호스트명 추출 (jdbc:mysql://hostname:port/dbname 형식 가정)
+          RDS_HOST=$(echo ${{ secrets.DB_URL }} | sed -E 's/jdbc:mysql:\/\/([^:\/]+).*/\1/')
+          echo "RDS_HOST=$RDS_HOST" >> $GITHUB_ENV
+          echo "RDS 호스트명이 추출되었습니다: $RDS_HOST"
+
+      - name: Start SSM Session for RDS Port Forwarding
+        run: |
+          # 백그라운드에서 SSM 세션 실행하여 RDS에 포트포워딩
+          nohup aws ssm start-session \
+            --target ${{ secrets.EC2_INSTANCE_ID }} \
+            --document-name AWS-StartPortForwardingSessionToRemoteHost \
+            --parameters '{"host":["${{ env.RDS_HOST }}"],"portNumber":["3306"],"localPortNumber":["3306"]}' \
+            > ssm_session.log 2>&1 &
+          # SSM 세션이 설정될 때까지 잠시 대기
+          sleep 10
+          echo "SSM 포트 포워딩 세션이 시작되었습니다."
+
       - name: Grant execute permission for gradlew
         run: chmod +x ./gradlew
 
       - name: Build and Test
         run: ./gradlew clean build
+        env:
+          # jOOQ 생성 시 필요한 데이터베이스 연결 정보
+          DB_URL: "jdbc:mysql://localhost:3306/${{ secrets.DB_NAME }}"
+          DB_USERNAME: ${{ secrets.DB_USERNAME }}
+          DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
+
+      - name: Terminate SSM Session
+        if: always()
+        run: |
+          # SSM 세션 종료 (빌드 성공/실패 여부와 관계없이 항상 실행)
+          SESSION_ID=$(grep -oP 'Starting session with SessionId: \K[a-zA-Z0-9-]+' ssm_session.log || echo "")
+          if [ -n "$SESSION_ID" ]; then
+            aws ssm terminate-session --session-id $SESSION_ID
+            echo "SSM 세션이 종료되었습니다: $SESSION_ID"
+          else
+            echo "실행 중인 SSM 세션을 찾을 수 없습니다."
+          fi
 
   deploy:
     if: github.event.pull_request.merged == true
@@ -47,11 +95,59 @@ jobs:
           distribution: 'temurin'
           cache: gradle
 
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ secrets.AWS_REGION }}
+
+      - name: Install Session Manager Plugin
+        run: |
+          curl "https://s3.amazonaws.com/session-manager-downloads/plugin/latest/ubuntu_64bit/session-manager-plugin.deb" -o "session-manager-plugin.deb"
+          sudo dpkg -i session-manager-plugin.deb
+
+      - name: Extract RDS hostname from DB_URL
+        run: |
+          # DB_URL에서 호스트명 추출 (jdbc:mysql://hostname:port/dbname 형식 가정)
+          RDS_HOST=$(echo ${{ secrets.DB_URL }} | sed -E 's/jdbc:mysql:\/\/([^:\/]+).*/\1/')
+          echo "RDS_HOST=$RDS_HOST" >> $GITHUB_ENV
+          echo "RDS 호스트명이 추출되었습니다: $RDS_HOST"
+
+      - name: Start SSM Session for RDS Port Forwarding
+        run: |
+          # 백그라운드에서 SSM 세션 실행하여 RDS에 포트포워딩
+          nohup aws ssm start-session \
+            --target ${{ secrets.EC2_INSTANCE_ID }} \
+            --document-name AWS-StartPortForwardingSessionToRemoteHost \
+            --parameters '{"host":["${{ env.RDS_HOST }}"],"portNumber":["3306"],"localPortNumber":["3306"]}' \
+            > ssm_session.log 2>&1 &
+          # SSM 세션이 설정될 때까지 잠시 대기
+          sleep 10
+          echo "SSM 포트 포워딩 세션이 시작되었습니다."
+
       - name: Grant execute permission for gradlew
         run: chmod +x ./gradlew
 
       - name: Build with Gradle
         run: ./gradlew clean build
+        env:
+          # jOOQ 생성 시 필요한 데이터베이스 연결 정보
+          DB_URL: "jdbc:mysql://localhost:3306/${{ secrets.DB_NAME }}"
+          DB_USERNAME: ${{ secrets.DB_USERNAME }}
+          DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
+
+      - name: Terminate SSM Session
+        if: always()
+        run: |
+          # SSM 세션 종료 (빌드 성공/실패 여부와 관계없이 항상 실행)
+          SESSION_ID=$(grep -oP 'Starting session with SessionId: \K[a-zA-Z0-9-]+' ssm_session.log || echo "")
+          if [ -n "$SESSION_ID" ]; then
+            aws ssm terminate-session --session-id $SESSION_ID
+            echo "SSM 세션이 종료되었습니다: $SESSION_ID"
+          else
+            echo "실행 중인 SSM 세션을 찾을 수 없습니다."
+          fi
 
       - name: Find Executable JAR
         id: find-jar
