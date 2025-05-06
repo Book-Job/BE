@@ -71,8 +71,10 @@ public class BoardController {
      * 내가 쓴 자유게시판 조회 및 선택 삭제
      */
     @GetMapping("/members")
-    public ResponseEntity<?> getMyPostingsInBoard(@AuthenticationPrincipal(expression = "member") Member member) {
-        MyPostingsInBoardResponse myPostingsInBoardResponse = boardFacade.getMyPostingsInBoard(member);
+    public ResponseEntity<?> getMyPostingsInBoard(@AuthenticationPrincipal(expression = "member") Member member,
+                                                  @RequestParam(required = false, defaultValue = "0") int page,
+                                                  @RequestParam(required = false, defaultValue = "10") int limit) {
+        MyPostingsInBoardResponse myPostingsInBoardResponse = boardFacade.getMyPostingsInBoard(member, page, limit);
         return ResponseEntity.ok(CommonResponse.success(myPostingsInBoardResponse));
     }
 

@@ -72,6 +72,6 @@ public class BoardWriteService {
             throw ForbiddenException.boardForbidden();
         }
 
-        board.delete();
+        board.softDelete();
     }
 }

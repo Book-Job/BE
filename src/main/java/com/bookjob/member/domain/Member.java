@@ -55,4 +55,8 @@ public class Member extends SoftDeleteEntity {
     public void updateNickname(String nickname) {
         this.nickname = nickname;
     }
+
+    public void updatePassword(Password password) {
+        this.password = password;
+    }
 }

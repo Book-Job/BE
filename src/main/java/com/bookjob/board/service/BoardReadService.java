@@ -59,10 +59,11 @@ public class BoardReadService {
         return !boardRepository.existsById(boardId);
     }
 
-    public MyPostingsInBoardResponse getMyPostingsInBoard(Member member) {
-        List<MyPostingsInBoard> myPostingsInBoardList =
-                boardRepository.findMyPostingsByMemberId(member.getId());
-        return new MyPostingsInBoardResponse(myPostingsInBoardList);
+    public MyPostingsInBoardResponse getMyPostingsInBoard(Member member, int page, int limit) {
+        Pageable pageable = PageRequest.of(page, limit, Sort.by(Sort.Direction.DESC, "createdAt"));
+        Page<MyPostingsInBoard> myPostingsInBoardList =
+                boardRepository.findMyPostingsByMemberId(member.getId(), pageable);
+        return MyPostingsInBoardResponse.of(myPostingsInBoardList);
     }
 
     public List<BoardBestResponse> getBoardBest() {

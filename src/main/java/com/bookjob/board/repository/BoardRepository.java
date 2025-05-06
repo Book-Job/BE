@@ -28,7 +28,7 @@ public interface BoardRepository extends JpaRepository<Board, Long> {
             WHERE b.deletedAt is null and
             b.memberId = :memberId
             """)
-    List<MyPostingsInBoard> findMyPostingsByMemberId(Long memberId);
+    Page<MyPostingsInBoard> findMyPostingsByMemberId(@Param("memberId") Long memberId, Pageable pageable);
 
     @Query("""
             SELECT b
