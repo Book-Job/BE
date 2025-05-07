@@ -25,6 +25,8 @@ bin/
 out/
 !**/src/main/**/out/
 !**/src/test/**/out/
+!src/main/java/
+!src/main/java/com/bookjob/jooq/generated/
 
 ### NetBeans ###
 /nbproject/private/
