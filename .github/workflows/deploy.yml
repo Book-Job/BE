@@ -26,39 +26,11 @@ jobs:
           distribution: 'temurin'
           cache: gradle
 
-      - name: Get Github Action IP
-        id: ip
-        uses: haythem/public-ip@v1.2
-
-      - name: Configure AWS credentials
-        uses: aws-actions/configure-aws-credentials@v1
-        with:
-          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-region: ${{ secrets.AWS_REGION }}
-
-      - name: Add Github Actions IP to RDS Security group
-        run: |
-          aws ec2 authorize-security-group-ingress --group-id ${{ secrets.RDS_SECURITY_GROUP_ID }} --protocol tcp --port 3306 --cidr ${{ steps.ip.outputs.ipv4 }}/32
-          echo "Added GitHub Actions IP (${{ steps.ip.outputs.ipv4 }}) to RDS security group"
-
       - name: Grant execute permission for gradlew
         run: chmod +x ./gradlew
 
       - name: Build and Test
         run: ./gradlew clean build
-        env:
-          # jOOQ 생성 시 필요한 데이터베이스 연결 정보
-          DB_URL: ${{ secrets.DB_URL }}
-          DB_NAME: ${{ secrets.DB_NAME }}
-          DB_USERNAME: ${{ secrets.DB_USERNAME }}
-          DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
-
-      - name: Remove Github Actions IP from RDS security group
-        if: always()
-        run: |
-          aws ec2 revoke-security-group-ingress --group-id ${{ secrets.RDS_SECURITY_GROUP_ID }} --protocol tcp --port 3306 --cidr ${{ steps.ip.outputs.ipv4 }}/32
-          echo "Removed GitHub Actions IP from RDS security group"
 
   deploy:
     if: github.event.pull_request.merged == true
@@ -75,10 +47,6 @@ jobs:
           distribution: 'temurin'
           cache: gradle
 
-      - name: Get Github Action IP
-        id: ip
-        uses: haythem/public-ip@v1.2
-
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v1
         with:
@@ -86,27 +54,11 @@ jobs:
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: ${{ secrets.AWS_REGION }}
 
-      - name: Add Github Actions IP to Security groups
-        run: |
-          # EC2 SSH 접근 허용
-          aws ec2 authorize-security-group-ingress --group-id ${{ secrets.EC2_SECURITY_GROUP_ID }} --protocol tcp --port 22 --cidr ${{ steps.ip.outputs.ipv4 }}/32
-          echo "Added GitHub Actions IP to EC2 security group for SSH"
-          
-          # RDS 접근 허용
-          aws ec2 authorize-security-group-ingress --group-id ${{ secrets.RDS_SECURITY_GROUP_ID }} --protocol tcp --port 3306 --cidr ${{ steps.ip.outputs.ipv4 }}/32
-          echo "Added GitHub Actions IP to RDS security group for MySQL"
-
       - name: Grant execute permission for gradlew
         run: chmod +x ./gradlew
 
       - name: Build with Gradle
         run: ./gradlew clean build
-        env:
-          # jOOQ 생성 시 필요한 데이터베이스 연결 정보
-          DB_URL: ${{ secrets.DB_URL }}
-          DB_NAME: ${{ secrets.DB_NAME }}
-          DB_USERNAME: ${{ secrets.DB_USERNAME }}
-          DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
 
       - name: Find Executable JAR
         id: find-jar
@@ -213,14 +165,3 @@ jobs:
               tail -n 50 app.log
               exit 1
             fi
-
-      - name: Remove Github Actions IP from security groups
-        if: always()
-        run: |
-          # EC2 SSH 접근 제거
-          aws ec2 revoke-security-group-ingress --group-id ${{ secrets.EC2_SECURITY_GROUP_ID }} --protocol tcp --port 22 --cidr ${{ steps.ip.outputs.ipv4 }}/32
-          echo "Removed GitHub Actions IP from EC2 security group"
-          
-          # RDS 접근 제거
-          aws ec2 revoke-security-group-ingress --group-id ${{ secrets.RDS_SECURITY_GROUP_ID }} --protocol tcp --port 3306 --cidr ${{ steps.ip.outputs.ipv4 }}/32
-          echo "Removed GitHub Actions IP from RDS security group"

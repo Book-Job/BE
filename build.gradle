@@ -2,7 +2,7 @@ plugins {
     id 'java'
     id 'org.springframework.boot' version '3.4.4'
     id 'io.spring.dependency-management' version '1.1.7'
-    id 'nu.studer.jooq' version '9.0'
+    id 'nu.studer.jooq' version '9.0' // 필요할 때만 사용
 }
 
 group = 'com'
@@ -63,6 +63,11 @@ dependencies {
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 }
 
+tasks.named('test') {
+    useJUnitPlatform()
+}
+
+// ======= jOOQ generator는 필요할 때만 사용 ======= //
 jooq {
     version = '3.19.21'
     configurations {
@@ -74,7 +79,7 @@ jooq {
                             System.getenv('DB_URL') + '/' + System.getenv('DB_NAME') :
                             'jdbc:mysql://localhost:3306/bookjob'
                     user = System.getenv('DB_USERNAME') ?: 'root'
-                    password = System.getenv('DB_PASSWORD') ?: 'root1234'
+                    password = System.getenv('DB_PASSWORD') ?: 'root'
                 }
 
                 generator {
@@ -92,7 +97,7 @@ jooq {
                     }
                     target {
                         packageName = 'com.bookjob.jooq.generated'
-                        directory = 'build/generated-src/jooq/main'
+                        directory = 'src/main/java'
                     }
                     strategy.name = 'org.jooq.codegen.DefaultGeneratorStrategy'
                 }
@@ -101,26 +106,15 @@ jooq {
     }
 }
 
-sourceSets {
-    main {
-        java {
-            srcDirs "$buildDir/generated/jooq"
-        }
-    }
+task copyJooqToMain(type: Copy) {
+    from "$buildDir/generated-src/jooq/main/com/bookjob/jooq/generated"
+    into "$projectDir/src/main/java/com/bookjob/jooq/generated"
 }
 
-tasks.named('test') {
-    useJUnitPlatform()
-}
-
+// ======= build 시 jooq generator 비활성화 ======= //
 tasks.named('generateJooq').configure {
-    allInputsDeclared = true
-
-    // DB_URL 확인을 위한 doFirst 추가
-    doFirst {
-        println "========== jOOQ DB_URL 확인 ==========="
-        def dbUrl = System.getenv('DB_URL')
-        println "DB_URL: ${dbUrl ?: '환경변수 없음'}"
-        println "======================================="
-    }
+    enabled = false
+    /**
+     * 마법 주문: ./gradlew generateJooq copyJooqToMain
+     */
 }
