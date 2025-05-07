@@ -26,57 +26,21 @@ jobs:
           distribution: 'temurin'
           cache: gradle
 
+      - name: Get Github Action IP
+        id: ip
+        uses: haythem/public-ip@v1.2
+
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v1
         with:
-          aws-access-key-id: ${{ secrets.SSM_AWS_ACCESS_KEY }}
-          aws-secret-access-key: ${{ secrets.SSM_AWS_SECRET_KEY }}
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: ${{ secrets.AWS_REGION }}
 
-      - name: Install Session Manager Plugin
+      - name: Add Github Actions IP to RDS Security group
         run: |
-          curl "https://s3.amazonaws.com/session-manager-downloads/plugin/latest/ubuntu_64bit/session-manager-plugin.deb" -o "session-manager-plugin.deb"
-          sudo dpkg -i session-manager-plugin.deb
-
-      - name: Extract RDS hostname from DB_URL
-        run: |
-          # DB_URL에서 호스트명 추출 (jdbc:mysql://hostname:port/dbname 형식 가정)
-          RDS_HOST=$(echo ${{ secrets.DB_URL }} | sed -E 's/jdbc:mysql:\/\/([^:\/]+).*/\1/')
-          echo "RDS_HOST=$RDS_HOST" >> $GITHUB_ENV
-          echo "RDS 호스트명이 추출되었습니다: $RDS_HOST"
-
-      - name: Start SSM Session for RDS Port Forwarding
-        run: |
-          # 백그라운드에서 SSM 세션 실행하여 RDS에 포트포워딩
-          nohup aws ssm start-session \
-            --target ${{ secrets.EC2_INSTANCE_ID }} \
-            --document-name AWS-StartPortForwardingSessionToRemoteHost \
-            --parameters '{"host":["${{ env.RDS_HOST }}"],"portNumber":["3306"],"localPortNumber":["3306"]}' \
-            > ssm_session.log 2>&1 &
-          # SSM 세션이 설정될 때까지 잠시 대기
-          sleep 20
-          echo "SSM 포트 포워딩 세션이 시작되었습니다."
-
-      - name: Verify SSM Session Connection
-        run: |
-          echo "========== SSM 세션 로그 확인 ==========="
-          if [ -f ssm_session.log ]; then
-            cat ssm_session.log
-          else
-            echo "ssm_session.log 파일이 없습니다."
-          fi
-          
-          echo "========== 로컬 포트 확인 ==========="
-          netstat -tuln | grep 3306 || echo "포트 3306이 리스닝 상태가 아닙니다."
-          
-          echo "========== 연결 테스트 ==========="
-          nc -z localhost 3306
-          if [ $? -eq 0 ]; then
-            echo "localhost:3306 연결 성공"
-          else
-            echo "localhost:3306 연결 실패"
-          fi
-          echo "====================================="
+          aws ec2 authorize-security-group-ingress --group-id ${{ secrets.RDS_SECURITY_GROUP_ID }} --protocol tcp --port 3306 --cidr ${{ steps.ip.outputs.ipv4 }}/32
+          echo "Added GitHub Actions IP (${{ steps.ip.outputs.ipv4 }}) to RDS security group"
 
       - name: Grant execute permission for gradlew
         run: chmod +x ./gradlew
@@ -85,21 +49,16 @@ jobs:
         run: ./gradlew clean build
         env:
           # jOOQ 생성 시 필요한 데이터베이스 연결 정보
-          DB_URL: "jdbc:mysql://localhost:3306/${{ secrets.DB_NAME }}"
+          DB_URL: ${{ secrets.DB_URL }}
+          DB_NAME: ${{ secrets.DB_NAME }}
           DB_USERNAME: ${{ secrets.DB_USERNAME }}
           DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
 
-      - name: Terminate SSM Session
+      - name: Remove Github Actions IP from RDS security group
         if: always()
         run: |
-          # SSM 세션 종료 (빌드 성공/실패 여부와 관계없이 항상 실행)
-          SESSION_ID=$(grep -oP 'Starting session with SessionId: \K[a-zA-Z0-9-]+' ssm_session.log || echo "")
-          if [ -n "$SESSION_ID" ]; then
-            aws ssm terminate-session --session-id $SESSION_ID
-            echo "SSM 세션이 종료되었습니다: $SESSION_ID"
-          else
-            echo "실행 중인 SSM 세션을 찾을 수 없습니다."
-          fi
+          aws ec2 revoke-security-group-ingress --group-id ${{ secrets.RDS_SECURITY_GROUP_ID }} --protocol tcp --port 3306 --cidr ${{ steps.ip.outputs.ipv4 }}/32
+          echo "Removed GitHub Actions IP from RDS security group"
 
   deploy:
     if: github.event.pull_request.merged == true
@@ -116,57 +75,26 @@ jobs:
           distribution: 'temurin'
           cache: gradle
 
+      - name: Get Github Action IP
+        id: ip
+        uses: haythem/public-ip@v1.2
+
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v1
         with:
-          aws-access-key-id: ${{ secrets.SSM_AWS_ACCESS_KEY }}
-          aws-secret-access-key: ${{ secrets.SSM_AWS_SECRET_KEY }}
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: ${{ secrets.AWS_REGION }}
 
-      - name: Install Session Manager Plugin
+      - name: Add Github Actions IP to Security groups
         run: |
-          curl "https://s3.amazonaws.com/session-manager-downloads/plugin/latest/ubuntu_64bit/session-manager-plugin.deb" -o "session-manager-plugin.deb"
-          sudo dpkg -i session-manager-plugin.deb
-
-      - name: Extract RDS hostname from DB_URL
-        run: |
-          # DB_URL에서 호스트명 추출 (jdbc:mysql://hostname:port/dbname 형식 가정)
-          RDS_HOST=$(echo ${{ secrets.DB_URL }} | sed -E 's/jdbc:mysql:\/\/([^:\/]+).*/\1/')
-          echo "RDS_HOST=$RDS_HOST" >> $GITHUB_ENV
-          echo "RDS 호스트명이 추출되었습니다: $RDS_HOST"
-
-      - name: Start SSM Session for RDS Port Forwarding
-        run: |
-          # 백그라운드에서 SSM 세션 실행하여 RDS에 포트포워딩
-          nohup aws ssm start-session \
-            --target ${{ secrets.EC2_INSTANCE_ID }} \
-            --document-name AWS-StartPortForwardingSessionToRemoteHost \
-            --parameters '{"host":["${{ env.RDS_HOST }}"],"portNumber":["3306"],"localPortNumber":["3306"]}' \
-            > ssm_session.log 2>&1 &
-          # SSM 세션이 설정될 때까지 잠시 대기
-          sleep 20
-          echo "SSM 포트 포워딩 세션이 시작되었습니다."
-
-      - name: Verify SSM Session Connection
-        run: |
-          echo "========== SSM 세션 로그 확인 ==========="
-          if [ -f ssm_session.log ]; then
-            cat ssm_session.log
-          else
-            echo "ssm_session.log 파일이 없습니다."
-          fi
+          # EC2 SSH 접근 허용
+          aws ec2 authorize-security-group-ingress --group-id ${{ secrets.EC2_SECURITY_GROUP_ID }} --protocol tcp --port 22 --cidr ${{ steps.ip.outputs.ipv4 }}/32
+          echo "Added GitHub Actions IP to EC2 security group for SSH"
           
-          echo "========== 로컬 포트 확인 ==========="
-          netstat -tuln | grep 3306 || echo "포트 3306이 리스닝 상태가 아닙니다."
-          
-          echo "========== 연결 테스트 ==========="
-          nc -z localhost 3306
-          if [ $? -eq 0 ]; then
-            echo "localhost:3306 연결 성공"
-          else
-            echo "localhost:3306 연결 실패"
-          fi
-          echo "====================================="
+          # RDS 접근 허용
+          aws ec2 authorize-security-group-ingress --group-id ${{ secrets.RDS_SECURITY_GROUP_ID }} --protocol tcp --port 3306 --cidr ${{ steps.ip.outputs.ipv4 }}/32
+          echo "Added GitHub Actions IP to RDS security group for MySQL"
 
       - name: Grant execute permission for gradlew
         run: chmod +x ./gradlew
@@ -175,21 +103,10 @@ jobs:
         run: ./gradlew clean build
         env:
           # jOOQ 생성 시 필요한 데이터베이스 연결 정보
-          DB_URL: "jdbc:mysql://localhost:3306/${{ secrets.DB_NAME }}"
+          DB_URL: ${{ secrets.DB_URL }}
+          DB_NAME: ${{ secrets.DB_NAME }}
           DB_USERNAME: ${{ secrets.DB_USERNAME }}
           DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
-
-      - name: Terminate SSM Session
-        if: always()
-        run: |
-          # SSM 세션 종료 (빌드 성공/실패 여부와 관계없이 항상 실행)
-          SESSION_ID=$(grep -oP 'Starting session with SessionId: \K[a-zA-Z0-9-]+' ssm_session.log || echo "")
-          if [ -n "$SESSION_ID" ]; then
-            aws ssm terminate-session --session-id $SESSION_ID
-            echo "SSM 세션이 종료되었습니다: $SESSION_ID"
-          else
-            echo "실행 중인 SSM 세션을 찾을 수 없습니다."
-          fi
 
       - name: Find Executable JAR
         id: find-jar
@@ -296,3 +213,14 @@ jobs:
               tail -n 50 app.log
               exit 1
             fi
+
+      - name: Remove Github Actions IP from security groups
+        if: always()
+        run: |
+          # EC2 SSH 접근 제거
+          aws ec2 revoke-security-group-ingress --group-id ${{ secrets.EC2_SECURITY_GROUP_ID }} --protocol tcp --port 22 --cidr ${{ steps.ip.outputs.ipv4 }}/32
+          echo "Removed GitHub Actions IP from EC2 security group"
+          
+          # RDS 접근 제거
+          aws ec2 revoke-security-group-ingress --group-id ${{ secrets.RDS_SECURITY_GROUP_ID }} --protocol tcp --port 3306 --cidr ${{ steps.ip.outputs.ipv4 }}/32
+          echo "Removed GitHub Actions IP from RDS security group"
