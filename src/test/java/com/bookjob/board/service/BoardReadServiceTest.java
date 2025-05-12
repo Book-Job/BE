@@ -116,14 +116,15 @@ public class BoardReadServiceTest {
         void 게시글_PK_로_상세_조회() {
             // given
             Long boardId = 1L;
+            Long memberId = 2L;
             BoardDetailResponse response = mock(BoardDetailResponse.class);
-            when(boardRepository.findBoardById(boardId)).thenReturn(Optional.of(response));
+            when(boardRepository.findBoardById(boardId, memberId)).thenReturn(Optional.of(response));
 
             // when
-            BoardDetailResponse boardDetails = boardReadService.getBoardDetails(boardId);
+            BoardDetailResponse boardDetails = boardReadService.getBoardDetails(boardId, memberId);
 
             // then
-            verify(boardRepository).findBoardById(boardId);
+            verify(boardRepository).findBoardById(boardId, memberId);
             assertThat(boardDetails).isEqualTo(response);
         }
 
@@ -131,11 +132,12 @@ public class BoardReadServiceTest {
         void 글이_존재하지_않을_때_NOTFOUND_반환() {
             // given
             Long wrongBoardId = 1L;
-            when(boardRepository.findBoardById(1L)).thenReturn(Optional.empty());
+            Long memberId = 2L;
+            when(boardRepository.findBoardById(1L, 2L)).thenReturn(Optional.empty());
 
             // when & then
-            assertThatThrownBy(() -> boardReadService.getBoardDetails(wrongBoardId)).isInstanceOf(NotFoundException.class);
-            verify(boardRepository).findBoardById(1L);
+            assertThatThrownBy(() -> boardReadService.getBoardDetails(wrongBoardId, memberId)).isInstanceOf(NotFoundException.class);
+            verify(boardRepository).findBoardById(1L, 2L);
         }
     }
 }

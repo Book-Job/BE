@@ -56,8 +56,9 @@ public class BoardController {
     }
 
     @GetMapping("/{boardId}")
-    public ResponseEntity<?> getBoard(@PathVariable Long boardId) {
-        BoardDetailResponse res = boardFacade.getBoardDetail(boardId);
+    public ResponseEntity<?> getBoard(@PathVariable Long boardId,
+                                      @AuthenticationPrincipal(expression = "member") Member member) {
+        BoardDetailResponse res = boardFacade.getBoardDetail(boardId, member);
 
         return ResponseEntity.ok(CommonResponse.success(res));
     }
