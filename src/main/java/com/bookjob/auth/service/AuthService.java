@@ -1,16 +1,24 @@
 package com.bookjob.auth.service;
 
+import com.bookjob.auth.domain.entity.TemporaryToken;
+import com.bookjob.auth.domain.repository.TemporaryTokenRepository;
 import com.bookjob.common.exception.ConflictException;
 import com.bookjob.common.exception.NotFoundException;
+import com.bookjob.email.dto.EmailVerificationRequest;
+import com.bookjob.member.dto.request.ChangePasswordRequest;
 import com.bookjob.member.repository.MemberRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+
+import java.time.LocalDateTime;
+import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
 public class AuthService {
 
     private final MemberRepository memberRepository;
+    private final TemporaryTokenRepository temporaryTokenRepository;
 
     public void checkDuplicatedEmail(String email) {
         if (memberRepository.existsByEmail(email)) {
@@ -34,5 +42,16 @@ public class AuthService {
         if (!memberRepository.existsByEmail(email)) {
             throw NotFoundException.emailNotFound();
         }
+    }
+
+    public String createTokenForChangePassword(String email) {
+        String resetToken = UUID.randomUUID().toString();
+        TemporaryToken token = new TemporaryToken(resetToken, email, LocalDateTime.now().plusMinutes(15));
+        temporaryTokenRepository.save(token);
+        return resetToken;
+    }
+
+    public boolean checkResetToken(String email, String resetToken) {
+        return temporaryTokenRepository.existsByTokenAndEmail(resetToken, email);
     }
 }

@@ -47,7 +47,7 @@ public class MemberFacade {
     @Transactional
     public void withdrawMember(Member member, String password) {
         if (!member.getPassword().matches(password, passwordEncoder)) {
-            throw BadRequestException.passwordMissmatch();
+            throw BadRequestException.passwordMismatch();
         }
 
         memberWriteService.deleteMember(member);
@@ -55,13 +55,18 @@ public class MemberFacade {
         eventPublisher.publishEvent(new MemberWithdrawalEvent(this, member.getId()));
     }
 
-    public void checkOriginalPassword(Long memberId, OriginalPasswordRequest request) {
-        if (!memberReadService.checkPasswordIsIdentical(memberId, request)) {
-            throw BadRequestException.passwordMissmatch();
+    public String checkOriginalPassword(Member member, OriginalPasswordRequest request) {
+        if (!memberReadService.checkPasswordIsIdentical(member.getId(), request)) {
+            throw BadRequestException.passwordMismatch();
         }
+        return authService.createTokenForChangePassword(member.getEmail());
+
     }
 
-    public void changePassword(Long id, ChangePasswordRequest request) {
-        memberWriteService.changePassword(id, request);
+    public void changePassword(Member member, ChangePasswordRequest request) {
+        if (!authService.checkResetToken(member.getEmail(), request.resetToken())) {
+            throw BadRequestException.invalidResetToken();
+        };
+        memberWriteService.changePassword(member.getId(), request);
     }
 }

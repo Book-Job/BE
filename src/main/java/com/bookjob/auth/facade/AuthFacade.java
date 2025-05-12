@@ -22,7 +22,7 @@ public class AuthFacade {
     }
 
     public void verifyCode(EmailVerificationRequest request) {
-        emailService.verifyCode(request);
+        emailService.verifyCodeAndDelete(request);
     }
 
     public void checkDuplicatedLoginId(String loginId) {
@@ -39,7 +39,7 @@ public class AuthFacade {
     }
 
     public String verifyCodeForLoginId(EmailVerificationRequest request) {
-        emailService.verifyCode(request);
+        emailService.verifyCodeAndDelete(request);
         return memberReadService.getMaskedLoginId(request.email());
     }
 
@@ -49,10 +49,13 @@ public class AuthFacade {
 
     public void sendCodeToEmailForPassword(String email) {
         authService.doesEmailExist(email);
-        emailService.requestEmailVerification(email, EmailReason.PASSWORD);
+        emailService.requestTemporaryPassword(email, EmailReason.PASSWORD);
     }
 
-    public void verifyCodeForPassword(EmailVerificationRequest request) {
-        emailService.verifyCode(request);
+    public String verifyCodeForPassword(EmailVerificationRequest request) {
+        String email = emailService.verifyCode(request);
+        String resetToken = authService.createTokenForChangePassword(email);
+        emailService.deleteFromEmailVerification(email);
+        return resetToken;
     }
 }

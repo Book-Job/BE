@@ -14,6 +14,7 @@ public class BadRequestException extends BaseException {
     static private final String JOB_SEEKING_ALREADY_DELETED = "이미 삭제된 구직 글입니다.";
     static private final String BOARD_ALREADY_DELETED = "이미 삭제된 자유게시판 글입니다.";
     static private final String PASSWORD_MISMATCH = "비밀번호가 일치하지 않습니다.";
+    static private final String INVALID_RESET_TOKEN = "유효하지 않은 임시 토큰입니다.";
 
     public BadRequestException(String message) {
         super(message, HttpStatus.BAD_REQUEST);
@@ -53,7 +54,11 @@ public class BadRequestException extends BaseException {
         return new BadRequestException(BOARD_ALREADY_DELETED);
     }
 
-    public static BadRequestException passwordMissmatch() {
+    public static BadRequestException passwordMismatch() {
         return new BadRequestException(PASSWORD_MISMATCH);
+    }
+
+    public static BadRequestException invalidResetToken() {
+        return new BadRequestException(INVALID_RESET_TOKEN);
     }
 }
