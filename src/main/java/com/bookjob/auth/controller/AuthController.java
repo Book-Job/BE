@@ -2,6 +2,7 @@ package com.bookjob.auth.controller;
 
 import com.bookjob.auth.dto.FindLoginIdResponse;
 import com.bookjob.auth.dto.MaskedEmailResponse;
+import com.bookjob.auth.dto.TempTokenResponse;
 import com.bookjob.auth.facade.AuthFacade;
 import com.bookjob.common.dto.CommonResponse;
 import com.bookjob.email.dto.EmailRequest;
@@ -89,11 +90,11 @@ public class AuthController {
     }
 
     /**
-     * 비밀번호 찾기 시, 이메일 인증 요청
+     * 비밀번호 찾기 시, 임시 비밀번호 확인
      */
-    @PostMapping("/email-verification/pw/code")
+    @PostMapping("/email-verification/pw/temp")
     public ResponseEntity<?> verifyCodeForPassword(@Valid @RequestBody EmailVerificationRequest request) {
-        authFacade.verifyCodeForPassword(request);
-        return ResponseEntity.ok(CommonResponse.success());
+        String resetToken = authFacade.verifyCodeForPassword(request);
+        return ResponseEntity.ok(CommonResponse.success(new TempTokenResponse(resetToken)));
     }
 }

@@ -49,8 +49,8 @@ public class BoardReadService {
         return new CursorBoardResponse(boards, lastBoardId);
     }
 
-    public BoardDetailResponse getBoardDetails(Long boardId) {
-        return boardRepository.findBoardById(boardId).orElseThrow(
+    public BoardDetailResponse getBoardDetails(Long boardId, Long memberId) {
+        return boardRepository.findBoardById(boardId, memberId).orElseThrow(
                 () -> NotFoundException.boardNotFound(boardId)
         );
     }

@@ -38,8 +38,8 @@ public class BoardFacade {
         boardWriteService.deleteBoard(boardId, member);
     }
 
-    public BoardDetailResponse getBoardDetail(Long boardId) {
-        return boardReadService.getBoardDetails(boardId);
+    public BoardDetailResponse getBoardDetail(Long boardId, Member member) {
+        return boardReadService.getBoardDetails(boardId, member.getId());
     }
 
     public List<BoardBestResponse> getBoardBest() {

@@ -32,6 +32,7 @@ public class EmailService {
     private static final int CODE_LENGTH = 6;
     private static final long EXPIRATION_MINUTES = 5;
     private static final String EMAIL_TITLE = "[북잡] 이메일 인증 번호를 알려드립니다.";
+    private static final String EMAIL_FOR_PASSWORD_TITLE = "[북잡] 임시 비밀 번호를 알려드립니다.";
 
     @Value("${spring.mail.username}")
     private String FROM_EMAIL;
@@ -89,7 +90,40 @@ public class EmailService {
         emailVerificationRepository.save(verification);
     }
 
-    public void verifyCode(EmailVerificationRequest request) {
+    public void verifyCodeAndDelete(EmailVerificationRequest request) {
+        String email = verifyCode(request);
+        deleteFromEmailVerification(email);
+    }
+
+    public void deleteFromEmailVerification(String email) {
+        emailVerificationRepository.deleteByEmail(email);
+    }
+
+    public void requestTemporaryPassword(String toEmail, EmailReason reason) {
+        String temporaryPassword = createTemporaryPassword();
+        sendEmail(FROM_EMAIL, toEmail, EMAIL_FOR_PASSWORD_TITLE, EmailBuilder.buildEmail(temporaryPassword));
+        saveOrUpdateVerification(toEmail, temporaryPassword, reason);
+    }
+
+    private String createTemporaryPassword() {
+        int length = 10;
+        String charSet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+                + "abcdefghijklmnopqrstuvwxyz"
+                + "0123456789"
+                + "!@#$%^&*";
+
+        StringBuilder password = new StringBuilder();
+        SecureRandom random = new SecureRandom();
+
+        for (int i = 0; i < length; i++) {
+            int index = random.nextInt(charSet.length());
+            password.append(charSet.charAt(index));
+        }
+
+        return password.toString();
+    }
+
+    public String verifyCode(EmailVerificationRequest request) {
         String email = request.email();
         String code = request.code();
 
@@ -102,7 +136,6 @@ public class EmailService {
         if (verification.getExpirationTime().isBefore(LocalDateTime.now())) {
             throw BadRequestException.verificationCodeExpired();
         }
-
-        emailVerificationRepository.deleteByEmail(email);
+        return email;
     }
 }

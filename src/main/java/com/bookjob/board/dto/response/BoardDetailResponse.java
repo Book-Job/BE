@@ -9,6 +9,7 @@ public record BoardDetailResponse(
         long commentCount,
         long viewCount,
         boolean isAuthentic,
+        boolean isWriter,
         LocalDateTime createdAt,
         LocalDateTime modifiedAt
 ) {
