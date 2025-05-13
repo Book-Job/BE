@@ -8,6 +8,7 @@ public record CommentResponse(
         String nickname,
         boolean isAuthentic,
         LocalDateTime createdAt,
-        LocalDateTime modifiedAt
+        LocalDateTime modifiedAt,
+        boolean isWriter
 ) {
 }

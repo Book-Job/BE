@@ -15,11 +15,11 @@ public class CommentReadService {
 
     private final CommentRepository commentRepository;
 
-    public List<CommentResponse> getCommentByBoardId(Long boardId, Long cursorId, int size) {
+    public List<CommentResponse> getCommentByBoardId(Long boardId, Long cursorId, int size, Long memberId) {
         if(cursorId == null || cursorId <= 1L) {
             cursorId = Long.MAX_VALUE;
         }
 
-        return commentRepository.findCommentByBoardId(boardId, cursorId, size);
+        return commentRepository.findCommentByBoardId(boardId, cursorId, size, memberId);
     }
 }

@@ -53,8 +53,9 @@ public class CommentController {
 
     @GetMapping
     public ResponseEntity<?> getComments(@PathVariable("boardId") Long boardId,
-                                         @RequestParam(value = "lastComment", required = false) Long lastCommentId) {
-        List<CommentResponse> response = commentFacade.getComments(boardId, lastCommentId, COMMENT_SIZE);
+                                         @RequestParam(value = "lastComment", required = false) Long lastCommentId,
+                                         @AuthenticationPrincipal(expression = "member") Member member) {
+        List<CommentResponse> response = commentFacade.getComments(boardId, lastCommentId, COMMENT_SIZE, member.getId());
 
         return ResponseEntity.ok(CommonResponse.success(response));
     }
