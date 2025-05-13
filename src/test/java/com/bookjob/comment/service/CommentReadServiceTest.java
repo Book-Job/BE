@@ -32,6 +32,7 @@ public class CommentReadServiceTest {
         void 게시판_PK를_이용하여_댓글을_20개_조회한다() {
             // given
             Long boardId = 1L;
+            Long memberId = 1L;
             int size = 20;
 
             List<CommentResponse> commentResponses = new ArrayList<>();
@@ -39,10 +40,10 @@ public class CommentReadServiceTest {
                 commentResponses.add(mock(CommentResponse.class));
             }
 
-            when(commentRepository.findCommentByBoardId(boardId, Long.MAX_VALUE, size)).thenReturn(commentResponses);
+            when(commentRepository.findCommentByBoardId(boardId, Long.MAX_VALUE, size, memberId)).thenReturn(commentResponses);
 
             // when
-            List<CommentResponse> result = commentReadService.getCommentByBoardId(boardId, null, size);
+            List<CommentResponse> result = commentReadService.getCommentByBoardId(boardId, null, size, memberId);
 
             // then
             Assertions.assertThat(result).hasSize(size);
@@ -53,6 +54,7 @@ public class CommentReadServiceTest {
             // given
             Long boardId = 1L;
             Long cursorId = -1L;
+            Long memberId = 1L;
             int size = 20;
 
             List<CommentResponse> commentResponses = new ArrayList<>();
@@ -60,10 +62,10 @@ public class CommentReadServiceTest {
                 commentResponses.add(mock(CommentResponse.class));
             }
 
-            when(commentRepository.findCommentByBoardId(boardId, Long.MAX_VALUE, size)).thenReturn(commentResponses);
+            when(commentRepository.findCommentByBoardId(boardId, Long.MAX_VALUE, size, memberId)).thenReturn(commentResponses);
 
             // when
-            List<CommentResponse> result = commentReadService.getCommentByBoardId(boardId, cursorId, size);
+            List<CommentResponse> result = commentReadService.getCommentByBoardId(boardId, cursorId, size, memberId);
 
             // then
             Assertions.assertThat(result).hasSize(size);
@@ -74,6 +76,7 @@ public class CommentReadServiceTest {
             // given
             Long boardId = 1L;
             Long cursorId = 10L;
+            Long memberId = 1L;
             int size = 20;
             int expectedResultCount = 10; // 커서 이후 댓글 수
 
@@ -82,10 +85,10 @@ public class CommentReadServiceTest {
                 expectedComments.add(mock(CommentResponse.class));
             }
 
-            when(commentRepository.findCommentByBoardId(boardId, cursorId, size)).thenReturn(expectedComments);
+            when(commentRepository.findCommentByBoardId(boardId, cursorId, size, memberId)).thenReturn(expectedComments);
 
             // when
-            List<CommentResponse> result = commentReadService.getCommentByBoardId(boardId, cursorId, size);
+            List<CommentResponse> result = commentReadService.getCommentByBoardId(boardId, cursorId, size, memberId);
 
             // then
             Assertions.assertThat(result).hasSize(expectedResultCount);

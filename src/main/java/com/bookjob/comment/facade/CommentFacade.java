@@ -47,11 +47,11 @@ public class CommentFacade {
         commentWriteService.deleteComment(commentId, member);
     }
 
-    public List<CommentResponse> getComments(Long boardId, Long lastComment, int size) {
+    public List<CommentResponse> getComments(Long boardId, Long lastComment, int size, Long memberId) {
         if (boardReadService.notExistsBoard(boardId)) {
             throw NotFoundException.boardNotFound(boardId);
         }
 
-        return commentReadService.getCommentByBoardId(boardId, lastComment, size);
+        return commentReadService.getCommentByBoardId(boardId, lastComment, size, memberId);
     }
 }
