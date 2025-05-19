@@ -12,7 +12,6 @@ import org.jooq.impl.DSL;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Repository;
 
 import java.time.LocalDateTime;
@@ -23,16 +22,17 @@ import java.util.stream.Collectors;
 
 import static com.bookjob.jooq.generated.Tables.JOB_POSTING;
 import static com.bookjob.jooq.generated.Tables.JOB_SEEKING;
+import static org.jooq.impl.DSL.*;
 
 @Repository
 @RequiredArgsConstructor
 public class JobPostingQueryRepositoryImpl implements JobPostingQueryRepository {
 
     private final DSLContext dslContext;
+    private final JobPosting jp = JobPosting.JOB_POSTING.as("jp");
 
     @Override
-    public List<JobPostingPreviewResponse> getJobPostingsOrderedBy(JobPostingOrder order, Long cursor, int size) {
-        JobPosting jp = JobPosting.JOB_POSTING.as("jp");
+    public List<JobPostingPreviewResponse> getJobPostingsOrderedBy(JobPostingOrder order, Long cursor, int size, String keyword) {
         LocalDateTime now = LocalDateTime.now();
 
         JobPostingPreviewResponse cursorPosting = null;
@@ -56,7 +56,7 @@ public class JobPostingQueryRepositoryImpl implements JobPostingQueryRepository 
                                    cursorPosting.closingDate().isAfter(now);
 
             if (isCursorOpen) {
-                Condition cursorCondition = getKeysetPaginationCondition(order, jp, cursorPosting);
+                Condition cursorCondition = getKeysetPaginationCondition(order, cursorPosting);
                 openCondition = openCondition.and(cursorCondition);
             } else {
                 openCondition = DSL.falseCondition();
@@ -67,7 +67,9 @@ public class JobPostingQueryRepositoryImpl implements JobPostingQueryRepository 
                 .select(jp.ID)
                 .from(jp)
                 .where(openCondition)
-                .orderBy(getOpenPostingSortFields(order, jp))
+                .and(jobPostingSearchCondition(keyword))
+                .and(jp.DELETED_AT.isNull())
+                .orderBy(getOpenPostingSortFields(order))
                 .limit(size)
                 .fetchInto(Long.class));
 
@@ -92,6 +94,8 @@ public class JobPostingQueryRepositoryImpl implements JobPostingQueryRepository 
                     .select(jp.ID)
                     .from(jp)
                     .where(closedCondition)
+                    .and(jobPostingSearchCondition(keyword))
+                    .and(jp.DELETED_AT.isNull())
                     .orderBy(jp.CREATED_AT.desc())
                     .limit(size - sortedIds.size())
                     .fetchInto(Long.class));
@@ -116,7 +120,7 @@ public class JobPostingQueryRepositoryImpl implements JobPostingQueryRepository 
     @Override
     public Page<MyPostingsInRecruitment> findMyPostingsByMemberId(Long memberId, Pageable pageable) {
         int page = pageable.getPageNumber();
-        int limit = pageable. getPageSize();
+        int limit = pageable.getPageSize();
 
         int total = dslContext.fetchCount(
                 DSL.selectOne()
@@ -138,7 +142,7 @@ public class JobPostingQueryRepositoryImpl implements JobPostingQueryRepository 
             return new PageImpl<>(Collections.emptyList(), pageable, 0);
         }
 
-        List<MyPostingsInRecruitment> list =  dslContext.select(
+        List<MyPostingsInRecruitment> list = dslContext.select(
                         DSL.field("recruitmentId", Long.class),
                         DSL.field("title", String.class),
                         DSL.field("created_at", LocalDateTime.class),
@@ -148,16 +152,16 @@ public class JobPostingQueryRepositoryImpl implements JobPostingQueryRepository 
                                 JOB_POSTING.ID.as("recruitmentId"),
                                 JOB_POSTING.TITLE,
                                 JOB_POSTING.CREATED_AT,
-                                DSL.inline("JOB_POSTING").as("recruitmentCategory"))
+                                inline("JOB_POSTING").as("recruitmentCategory"))
                         .from(JOB_POSTING)
                         .where(JOB_POSTING.DELETED_AT.isNull()
                                 .and(JOB_POSTING.MEMBER_ID.eq(memberId)))
                         .unionAll(
                                 DSL.select(
-                                            JOB_SEEKING.ID.as("recruitmentId"),
-                                            JOB_SEEKING.TITLE,
-                                            JOB_SEEKING.CREATED_AT,
-                                            DSL.inline("JOB_SEEKING").as("recruitmentCategory"))
+                                                JOB_SEEKING.ID.as("recruitmentId"),
+                                                JOB_SEEKING.TITLE,
+                                                JOB_SEEKING.CREATED_AT,
+                                                inline("JOB_SEEKING").as("recruitmentCategory"))
                                         .from(JOB_SEEKING)
                                         .where(JOB_SEEKING.DELETED_AT.isNull()
                                                 .and(JOB_SEEKING.MEMBER_ID.eq(memberId)))
@@ -172,7 +176,6 @@ public class JobPostingQueryRepositoryImpl implements JobPostingQueryRepository 
     }
 
     private Condition getKeysetPaginationCondition(JobPostingOrder order,
-                                                   JobPosting jp,
                                                    JobPostingPreviewResponse cursor) {
         return switch (order) {
             case POPULAR -> jp.VIEW_COUNT.lessThan(cursor.viewCount())
@@ -199,7 +202,7 @@ public class JobPostingQueryRepositoryImpl implements JobPostingQueryRepository 
         };
     }
 
-    private List<SortField<?>> getOpenPostingSortFields(JobPostingOrder order, JobPosting jp) {
+    private List<SortField<?>> getOpenPostingSortFields(JobPostingOrder order) {
         LocalDateTime now = LocalDateTime.now();
 
         return switch (order) {
@@ -231,5 +234,13 @@ public class JobPostingQueryRepositoryImpl implements JobPostingQueryRepository 
                     jp.CREATED_AT.desc()
             );
         };
+    }
+
+    private Condition jobPostingSearchCondition(String keyword) {
+        if (keyword == null || keyword.isBlank()) {
+            return DSL.noCondition();
+        }
+
+        return jp.TITLE.likeIgnoreCase(concat(inline("%"), val(keyword), inline("%")));
     }
 }

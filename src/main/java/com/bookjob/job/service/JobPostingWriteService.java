@@ -47,9 +47,8 @@ public class JobPostingWriteService {
         JobCategory jobCategory = JobCategory.fromString(request.jobCategory());
         EmploymentType employmentType = EmploymentType.fromString(request.employmentType());
 
-        JobPosting jobPosting = jobPostingRepository.findById(id).orElseThrow(
-                NotFoundException::jobPostingNotFound
-        );
+        JobPosting jobPosting = jobPostingRepository.findByIdAndDeletedAtIsNull(id)
+                .orElseThrow(NotFoundException::jobPostingNotFound);
 
         if (!jobPosting.getMemberId().equals(member.getId())) {
             throw ForbiddenException.forbidden();
@@ -69,9 +68,8 @@ public class JobPostingWriteService {
     }
 
     public void deleteJobPosting(Long id, Member member) {
-        JobPosting jobPosting = jobPostingRepository.findById(id).orElseThrow(
-                NotFoundException::jobPostingNotFound
-        );
+        JobPosting jobPosting = jobPostingRepository.findById(id)
+                .orElseThrow(NotFoundException::jobPostingNotFound);
 
         if (!jobPosting.getMemberId().equals(member.getId())) {
             throw ForbiddenException.forbidden();

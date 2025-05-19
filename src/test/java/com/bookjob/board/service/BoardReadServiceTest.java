@@ -1,5 +1,6 @@
 package com.bookjob.board.service;
 
+import com.bookjob.board.domain.Board;
 import com.bookjob.board.dto.response.BoardDetailResponse;
 import com.bookjob.board.dto.response.BoardPreviewResponse;
 import com.bookjob.board.dto.response.CursorBoardResponse;
@@ -117,15 +118,26 @@ public class BoardReadServiceTest {
             // given
             Long boardId = 1L;
             Long memberId = 2L;
-            BoardDetailResponse response = mock(BoardDetailResponse.class);
-            when(boardRepository.findBoardById(boardId, memberId)).thenReturn(Optional.of(response));
+
+            Board board = spy(boardFixture());
+            when(board.getMemberId()).thenReturn(3L);
+
+            when(boardRepository.findBoardByIdAndDeletedAtIsNull(boardId)).thenReturn(Optional.of(board));
 
             // when
-            BoardDetailResponse boardDetails = boardReadService.getBoardDetails(boardId, memberId);
+            BoardDetailResponse response = boardReadService.getBoardDetails(boardId, memberId);
 
             // then
-            verify(boardRepository).findBoardById(boardId, memberId);
-            assertThat(boardDetails).isEqualTo(response);
+            verify(boardRepository).findBoardByIdAndDeletedAtIsNull(boardId);
+            verify(board).increaseViewCount();
+
+            assertThat(response.title()).isEqualTo(board.getTitle());
+            assertThat(response.text()).isEqualTo(board.getText());
+            assertThat(response.nickname()).isEqualTo(board.getNickname());
+            assertThat(response.isAuthentic()).isEqualTo(board.getIsAuthentic());
+            assertThat(response.isWriter()).isFalse();
+            assertThat(response.createdAt()).isEqualTo(board.getCreatedAt());
+            assertThat(response.modifiedAt()).isEqualTo(board.getModifiedAt());
         }
 
         @Test
@@ -133,11 +145,24 @@ public class BoardReadServiceTest {
             // given
             Long wrongBoardId = 1L;
             Long memberId = 2L;
-            when(boardRepository.findBoardById(1L, 2L)).thenReturn(Optional.empty());
+
+            when(boardRepository.findBoardByIdAndDeletedAtIsNull(wrongBoardId)).thenReturn(Optional.empty());
 
             // when & then
-            assertThatThrownBy(() -> boardReadService.getBoardDetails(wrongBoardId, memberId)).isInstanceOf(NotFoundException.class);
-            verify(boardRepository).findBoardById(1L, 2L);
+            assertThatThrownBy(() -> boardReadService.getBoardDetails(wrongBoardId, memberId))
+                    .isInstanceOf(NotFoundException.class);
+
+            verify(boardRepository).findBoardByIdAndDeletedAtIsNull(wrongBoardId);
         }
+    }
+
+    private Board boardFixture() {
+        return Board.builder()
+                .isAuthentic(true)
+                .memberId(1L)
+                .nickname("테스트유저")
+                .text("테스트 본문입니다. 게시글 내용이 여기에 들어갑니다.")
+                .title("테스트 게시글입니다")
+                .build();
     }
 }

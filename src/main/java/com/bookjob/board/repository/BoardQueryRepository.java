@@ -10,16 +10,15 @@ import org.springframework.stereotype.Repository;
 import java.util.List;
 
 import static com.bookjob.jooq.generated.tables.Board.BOARD;
-import static org.jooq.impl.DSL.noCondition;
+import static org.jooq.impl.DSL.*;
 
 @Repository
 @RequiredArgsConstructor
 public class BoardQueryRepository {
     private final DSLContext dslContext;
+    private final Board b = BOARD.as("board");
 
     public List<BoardPreviewResponse> getBoardListWithKeyword(String keyword, Long cursor, int limit) {
-        Board b = BOARD.as("board");
-
         return dslContext
                 .select(
                         b.ID.as("boardId"),
@@ -48,7 +47,10 @@ public class BoardQueryRepository {
             return result;
         }
 
-        return result.and(BOARD.TITLE.like("%" + keyword + "%")).or(BOARD.TEXT.like("%" + keyword + "%"));
+        return result.and(
+                b.TITLE.like(concat(inline("%"), val(keyword), inline("%")))
+                        .or(b.TEXT.like(concat(inline("%"), val(keyword), inline("%"))))
+        );
     }
 
     private Condition boardIdCursorCondition(Long cursor) {
@@ -56,9 +58,9 @@ public class BoardQueryRepository {
         Condition result = noCondition();
 
         if (cursor == null || cursor == 0L) {
-            return result.and(BOARD.ID.lessThan(maxCondition));
+            return result.and(b.ID.lessThan(maxCondition));
         }
 
-        return result.and(BOARD.ID.lessThan(cursor));
+        return result.and(b.ID.lessThan(cursor));
     }
 }

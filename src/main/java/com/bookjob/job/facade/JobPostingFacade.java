@@ -25,10 +25,10 @@ public class JobPostingFacade {
         jobPostingWriteService.createJobPosting(request, member);
     }
 
-    public CursorJobPostingResponse getJobPostings(String order, Long cursor, int pageSize) {
+    public CursorJobPostingResponse getJobPostings(String order, Long cursor, int pageSize, String keyword) {
         JobPostingOrder jobPostingOrder = JobPostingOrder.fromString(order);
 
-        return jobPostingReadService.getJobPostings(jobPostingOrder, cursor, pageSize);
+        return jobPostingReadService.getJobPostings(jobPostingOrder, cursor, pageSize, keyword);
     }
 
     public void updateJobPosting(Long id, JobPostingUpdateRequest request, Member member) {

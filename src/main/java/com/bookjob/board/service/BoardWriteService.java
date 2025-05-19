@@ -34,9 +34,8 @@ public class BoardWriteService {
     }
 
     public void updateBoard(BoardUpdateRequest request, Member member, Long boardId) {
-        Board board = boardRepository.findById(boardId).orElseThrow(
-                () -> NotFoundException.boardNotFound(boardId)
-        );
+        Board board = boardRepository.findBoardByIdAndDeletedAtIsNull(boardId)
+                .orElseThrow(() -> NotFoundException.boardNotFound(boardId));
 
         if (!board.getMemberId().equals(member.getId())) {
             throw ForbiddenException.forbidden();
@@ -46,9 +45,8 @@ public class BoardWriteService {
     }
 
     public void deleteBoard(Long boardId, Member member) {
-        Board board = boardRepository.findById(boardId).orElseThrow(
-                () -> NotFoundException.boardNotFound(boardId)
-        );
+        Board board = boardRepository.findBoardByIdAndDeletedAtIsNull(boardId)
+                .orElseThrow(() -> NotFoundException.boardNotFound(boardId));
 
         if (!board.getMemberId().equals(member.getId())) {
             throw ForbiddenException.forbidden();
@@ -59,19 +57,21 @@ public class BoardWriteService {
 
     public void deleteMyPostingsInBoard(Member member, BoardIdsRequest request) {
         for (Long boardId : request.ids()) {
-            deleteBoard(member, boardId);
+            deleteBoard(boardId, member);
         }
     }
 
-    private void deleteBoard(Member member, Long boardId) {
-        Board board = boardRepository.findById(boardId).orElseThrow(
-                () -> NotFoundException.boardNotFound(boardId)
-        );
+    public void increaseCommentCount(Long boardId) {
+        Board board = boardRepository.findBoardByIdAndDeletedAtIsNull(boardId)
+                .orElseThrow(() -> NotFoundException.boardNotFound(boardId));
 
-        if (!board.getMemberId().equals(member.getId())) {
-            throw ForbiddenException.boardForbidden();
-        }
+        board.increaseCommentCount();
+    }
 
-        board.softDelete();
+    public void decreaseCommentCount(Long boardId) {
+        Board board = boardRepository.findBoardByIdAndDeletedAtIsNull(boardId)
+                .orElseThrow(() -> NotFoundException.boardNotFound(boardId));
+
+        board.decreaseCommentCount();
     }
 }
