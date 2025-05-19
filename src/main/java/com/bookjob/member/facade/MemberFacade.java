@@ -63,10 +63,9 @@ public class MemberFacade {
 
     }
 
-    public void changePassword(Member member, ChangePasswordRequest request) {
-        if (!authService.checkResetToken(member.getEmail(), request.resetToken())) {
-            throw BadRequestException.invalidResetToken();
-        };
+    public void changePassword(ChangePasswordRequest request) {
+        String email = authService.checkResetToken(request.resetToken());
+        Member member = memberReadService.getMemberByEmail(email);
         memberWriteService.changePassword(member.getId(), request);
     }
 }

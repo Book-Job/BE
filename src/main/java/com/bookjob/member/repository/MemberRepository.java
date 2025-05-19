@@ -49,4 +49,6 @@ public interface MemberRepository extends JpaRepository<Member, Long> {
 
     @Query("SELECT m.password FROM Member m WHERE m.id = :id AND m.deletedAt IS NULL")
     Optional<Password> findPasswordById(@Param("id") Long id);
+
+    Optional<Member> findByEmail(@Param("email") String email);
 }

@@ -64,9 +64,8 @@ public class MemberController {
     }
 
     @PostMapping("/password/change")
-    public ResponseEntity<?> changePassword(@AuthenticationPrincipal(expression = "member") Member member,
-                                                   @RequestBody @Valid ChangePasswordRequest request) {
-        memberFacade.changePassword(member, request);
+    public ResponseEntity<?> changePassword(@RequestBody @Valid ChangePasswordRequest request) {
+        memberFacade.changePassword(request);
         return ResponseEntity.ok(CommonResponse.success());
     }
 }

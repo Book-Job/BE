@@ -8,12 +8,14 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.util.Optional;
 
 public interface TemporaryTokenRepository extends JpaRepository<TemporaryToken, String> {
-    boolean existsByTokenAndEmail(@Param("resetToken") String resetToken, @Param("email") String email);
 
     @Modifying
     @Transactional
     @Query("DELETE FROM TemporaryToken t WHERE t.expiresAt < :now")
     void deleteExpiredTokens(@Param("now") LocalDateTime now);
+
+    Optional<TemporaryToken> findByToken(@Param("token") String token);
 }
