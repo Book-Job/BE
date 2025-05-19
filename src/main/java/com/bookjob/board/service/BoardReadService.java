@@ -49,6 +49,7 @@ public class BoardReadService {
         return new CursorBoardResponse(boards, lastBoardId);
     }
 
+    @Transactional
     public BoardDetailResponse getBoardDetails(Long boardId, Long memberId) {
         Board board = boardRepository.findBoardByIdAndDeletedAtIsNull(boardId).orElseThrow(
                 () -> NotFoundException.boardNotFound(boardId)
