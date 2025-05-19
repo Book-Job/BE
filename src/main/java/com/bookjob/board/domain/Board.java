@@ -1,6 +1,7 @@
 package com.bookjob.board.domain;
 
 import com.bookjob.common.domain.SoftDeleteEntity;
+import com.bookjob.common.exception.InternalServerError;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Builder;
@@ -51,18 +52,15 @@ public class Board extends SoftDeleteEntity {
         this.viewCount++;
     }
 
-    public boolean increaseCommentCount() {
+    public void increaseCommentCount() {
         this.commentCount++;
-        return true;
     }
 
-    public boolean decreaseViewCount() {
+    public void decreaseCommentCount() {
         if (commentCount < 0) {
-            return false;
+            throw InternalServerError.negativeCountError(commentCount);
         }
 
-        this.viewCount--;
-
-        return true;
+        this.commentCount--;
     }
 }

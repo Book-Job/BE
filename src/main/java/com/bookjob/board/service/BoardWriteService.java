@@ -60,4 +60,18 @@ public class BoardWriteService {
             deleteBoard(boardId, member);
         }
     }
+
+    public void increaseCommentCount(Long boardId) {
+        Board board = boardRepository.findBoardByIdAndDeletedAtIsNull(boardId)
+                .orElseThrow(() -> NotFoundException.boardNotFound(boardId));
+
+        board.increaseCommentCount();
+    }
+
+    public void decreaseCommentCount(Long boardId) {
+        Board board = boardRepository.findBoardByIdAndDeletedAtIsNull(boardId)
+                .orElseThrow(() -> NotFoundException.boardNotFound(boardId));
+
+        board.decreaseCommentCount();
+    }
 }
