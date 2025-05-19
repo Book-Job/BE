@@ -70,9 +70,7 @@ jooq {
             generationTool {
                 jdbc {
                     driver = 'com.mysql.cj.jdbc.Driver'
-                    url = System.getenv('DB_URL') != null ?
-                            System.getenv('DB_URL') + '/' + (System.getenv('DB_NAME') ?: 'bookjob') :
-                            'jdbc:mysql://localhost:3306/bookjob'
+                    url = System.getenv('DB_URL') != null ? System.getenv('DB_URL') + '/' + System.getenv('DB_NAME') : 'jdbc:mysql://localhost:3306/bookjob'
                     user = System.getenv('DB_USER') ?: 'root'
                     password = System.getenv('DB_PASSWORD') ?: 'root1234'
                 }
@@ -81,7 +79,7 @@ jooq {
                     name = 'org.jooq.codegen.DefaultGenerator'
                     database {
                         name = 'org.jooq.meta.mysql.MySQLDatabase'
-                        inputSchema = 'bookjob'
+                        inputSchema = System.getenv('DB_NAME') != null ?: 'bookjob'
                         includes = '.*'
                     }
                     generate {
