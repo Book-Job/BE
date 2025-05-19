@@ -88,7 +88,8 @@ public class BoardWriteServiceTest {
 
             when(member.getId()).thenReturn(memberId);
             when(mockBoard.getMemberId()).thenReturn(memberId);
-            when(boardRepository.findById(eq(1L))).thenReturn(Optional.of(mockBoard));
+            when(boardRepository.findBoardByIdAndDeletedAtIsNull(eq(1L)))
+                    .thenReturn(Optional.of(mockBoard));
 
             // when
             boardWriteService.updateBoard(request, member, memberId);
@@ -108,7 +109,8 @@ public class BoardWriteServiceTest {
 
             when(member.getId()).thenReturn(memberId);
             when(mockBoard.getMemberId()).thenReturn(2L);
-            when(boardRepository.findById(eq(1L))).thenReturn(Optional.of(mockBoard));
+            when(boardRepository.findBoardByIdAndDeletedAtIsNull(eq(1L)))
+                    .thenReturn(Optional.of(mockBoard));
 
             // when
             assertThatThrownBy(() -> boardWriteService.updateBoard(request, member, memberId))
@@ -130,7 +132,7 @@ public class BoardWriteServiceTest {
 
             when(member.getId()).thenReturn(memberId);
             when(mockBoard.getMemberId()).thenReturn(memberId);
-            when(boardRepository.findById(eq(boardId))).thenReturn(Optional.of(mockBoard));
+            when(boardRepository.findBoardByIdAndDeletedAtIsNull(eq(boardId))).thenReturn(Optional.of(mockBoard));
 
             // when
             boardWriteService.deleteBoard(boardId, member);
@@ -150,7 +152,7 @@ public class BoardWriteServiceTest {
 
             when(member.getId()).thenReturn(wrongMemberId);
             when(mockBoard.getMemberId()).thenReturn(memberId);
-            when(boardRepository.findById(eq(boardId))).thenReturn(Optional.of(mockBoard));
+            when(boardRepository.findBoardByIdAndDeletedAtIsNull(eq(boardId))).thenReturn(Optional.of(mockBoard));
 
             // when
             assertThatThrownBy(() -> boardWriteService.deleteBoard(boardId, member))
