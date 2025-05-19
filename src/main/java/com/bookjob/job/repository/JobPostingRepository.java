@@ -8,6 +8,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 import java.time.LocalDateTime;
+import java.util.Optional;
 
 public interface JobPostingRepository extends JpaRepository<JobPosting, Long>, JobPostingQueryRepository {
     @Query("""
@@ -17,6 +18,8 @@ public interface JobPostingRepository extends JpaRepository<JobPosting, Long>, J
               AND j.deletedAt is null
             """)
     Page<JobPosting> findRecentPosts(@Param("since") LocalDateTime since, Pageable pageable);
+
+    Optional<JobPosting> findByIdAndDeletedAtIsNull(Long id);
 
     void deleteAllByMemberId(Long memberId);
 }
