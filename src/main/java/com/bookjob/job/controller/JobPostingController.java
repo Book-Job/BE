@@ -30,8 +30,9 @@ public class JobPostingController {
 
     @GetMapping
     public ResponseEntity<?> getJobPostings(@RequestParam(required = false) Long last,
-                                            @RequestParam(required = false) String order) {
-        CursorJobPostingResponse response = jobPostingFacade.getJobPostings(order, last, pageSize);
+                                            @RequestParam(required = false) String order,
+                                            @RequestParam(required = false) String keyword) {
+        CursorJobPostingResponse response = jobPostingFacade.getJobPostings(order, last, pageSize, keyword);
 
         return ResponseEntity.ok(CommonResponse.success(response));
     }
