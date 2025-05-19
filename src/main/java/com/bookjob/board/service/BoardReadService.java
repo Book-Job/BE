@@ -50,9 +50,24 @@ public class BoardReadService {
     }
 
     public BoardDetailResponse getBoardDetails(Long boardId, Long memberId) {
-        return boardRepository.findBoardById(boardId, memberId).orElseThrow(
+        Board board = boardRepository.findBoardByIdAndDeletedAtIsNull(boardId).orElseThrow(
                 () -> NotFoundException.boardNotFound(boardId)
         );
+
+        board.increaseViewCount();
+
+        boolean isWriter = board.getMemberId().equals(memberId);
+
+        return new BoardDetailResponse(
+                board.getTitle(),
+                board.getText(),
+                board.getNickname(),
+                board.getCommentCount(),
+                board.getViewCount(),
+                board.getIsAuthentic(),
+                isWriter,
+                board.getCreatedAt(),
+                board.getModifiedAt());
     }
 
     public boolean notExistsBoard(Long boardId) {
