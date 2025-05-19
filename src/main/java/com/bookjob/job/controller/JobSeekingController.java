@@ -29,8 +29,9 @@ public class JobSeekingController {
 
     @GetMapping
     public ResponseEntity<?> getJobSeekings(@RequestParam(required = false) Long last,
-                                            @RequestParam(required = false) String order) {
-        CursorJobSeekingResponse response = jobSeekingFacade.getJobSeekings(order, last, pageSize);
+                                            @RequestParam(required = false) String order,
+                                            @RequestParam(required = false) String keyword) {
+        CursorJobSeekingResponse response = jobSeekingFacade.getJobSeekings(order, last, keyword, pageSize);
         return ResponseEntity.ok(CommonResponse.success(response));
     }
 

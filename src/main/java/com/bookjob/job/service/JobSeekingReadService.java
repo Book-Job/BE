@@ -20,11 +20,11 @@ public class JobSeekingReadService {
 
     private final JobSeekingRepository jobSeekingRepository;
 
-    public CursorJobSeekingResponse getJobSeekings(JobSeekingOrder order, Long cursor, int pageSize) {
+    public CursorJobSeekingResponse getJobSeekings(JobSeekingOrder order, Long cursor, String keyword, int pageSize) {
         String jobCategory = extractCategoryFromOrder(order); // null이면 전체
         List<JobSeekingPreviewResponse> jobSeekings = jobSeekingRepository
-                .getJobSeekingsOrderedBy(cursor, jobCategory, pageSize);
-        Long newCursor = jobSeekings.get(jobSeekings.size() - 1).id();
+                .getJobSeekingsOrderedBy(cursor, jobCategory, keyword, pageSize);
+        Long newCursor = (jobSeekings.isEmpty()) ? null : jobSeekings.get(jobSeekings.size() - 1).id();
         return new CursorJobSeekingResponse(jobSeekings, newCursor);
     }
 
