@@ -18,7 +18,6 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.Comparator;
 import java.util.List;
@@ -32,8 +31,8 @@ public class JobPostingReadService {
 
     private final JobPostingRepository jobPostingRepository;
 
-    public CursorJobPostingResponse getJobPostings(JobPostingOrder order, Long cursor, int pageSize) {
-        List<JobPostingPreviewResponse> response = jobPostingRepository.getJobPostingsOrderedBy(order, cursor, pageSize);
+    public CursorJobPostingResponse getJobPostings(JobPostingOrder order, Long cursor, int pageSize, String keyword) {
+        List<JobPostingPreviewResponse> response = jobPostingRepository.getJobPostingsOrderedBy(order, cursor, pageSize, keyword);
         if (response.isEmpty()) {
             return new CursorJobPostingResponse(response, null);
         }
@@ -92,8 +91,8 @@ public class JobPostingReadService {
         int viewCount = Optional.ofNullable(jobPosting.getViewCount()).orElse(0);
 
         return viewCount * 5.0
-                + timeScore
-                + randomFactor;
+               + timeScore
+               + randomFactor;
     }
 
 }

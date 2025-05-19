@@ -9,7 +9,7 @@ import org.springframework.data.domain.Pageable;
 import java.util.List;
 
 public interface JobPostingQueryRepository {
-    List<JobPostingPreviewResponse> getJobPostingsOrderedBy(JobPostingOrder order, Long cursor, int size);
+    List<JobPostingPreviewResponse> getJobPostingsOrderedBy(JobPostingOrder order, Long cursor, int size, String keyword);
 
     Page<MyPostingsInRecruitment> findMyPostingsByMemberId(Long id, Pageable pageable);
 }
