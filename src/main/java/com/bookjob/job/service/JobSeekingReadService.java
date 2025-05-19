@@ -29,7 +29,7 @@ public class JobSeekingReadService {
     }
 
     public JobSeekingDetailsResponse getJobSeekingDetails(Long id) {
-        JobSeeking jobSeeking = jobSeekingRepository.findById(id)
+        JobSeeking jobSeeking = jobSeekingRepository.findByIdAndDeletedAtIsNull(id)
                 .orElseThrow(NotFoundException::jobSeekingNotFound);
 
         jobSeeking.incrementViewCount();

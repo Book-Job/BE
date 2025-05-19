@@ -42,9 +42,8 @@ public class JobPostingReadService {
     }
 
     public JobPostingDetailsResponse getJobPostingDetails(Long id) {
-        JobPosting jobPosting = jobPostingRepository.findById(id).orElseThrow(
-                NotFoundException::jobPostingNotFound
-        );
+        JobPosting jobPosting = jobPostingRepository.findByIdAndDeletedAtIsNull(id)
+                .orElseThrow(NotFoundException::jobPostingNotFound);
 
         jobPosting.incrementViewCount();
 

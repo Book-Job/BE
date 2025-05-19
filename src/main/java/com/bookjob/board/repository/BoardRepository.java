@@ -1,7 +1,6 @@
 package com.bookjob.board.repository;
 
 import com.bookjob.board.domain.Board;
-import com.bookjob.board.dto.response.BoardDetailResponse;
 import com.bookjob.member.dto.MyPostingsInBoard;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -13,21 +12,7 @@ import java.time.LocalDateTime;
 import java.util.Optional;
 
 public interface BoardRepository extends JpaRepository<Board, Long> {
-    @Query("""
-            SELECT new com.bookjob.board.dto.response.BoardDetailResponse(
-            b.title,
-            b.text,
-            b.nickname,
-            b.commentCount,
-            b.viewCount,
-            b.isAuthentic,
-            CASE WHEN b.memberId = :memberId THEN true ELSE false END,
-            b.createdAt,
-            b.modifiedAt
-            )
-            FROM Board b WHERE b.id = :id AND b.deletedAt IS NULL
-            """)
-    Optional<BoardDetailResponse> findBoardById(@Param("id") Long id, @Param("memberId") Long memberId);
+    Optional<Board> findBoardByIdAndDeletedAtIsNull(Long id);
 
     @Query("""
             SELECT new com.bookjob.member.dto.MyPostingsInBoard(

@@ -1,7 +1,6 @@
 package com.bookjob.board.domain;
 
 import com.bookjob.common.domain.SoftDeleteEntity;
-import com.bookjob.common.exception.BadRequestException;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Builder;
@@ -48,9 +47,8 @@ public class Board extends SoftDeleteEntity {
         this.text = newText;
     }
 
-    public boolean increaseViewCount() {
+    public void increaseViewCount() {
         this.viewCount++;
-        return true;
     }
 
     public boolean increaseCommentCount() {
@@ -66,12 +64,5 @@ public class Board extends SoftDeleteEntity {
         this.viewCount--;
 
         return true;
-    }
-
-    public void softDelete() {
-        if (this.getDeletedAt() != null) {
-            throw BadRequestException.boardAlreadyDeleted();
-        }
-        this.delete();
     }
 }
