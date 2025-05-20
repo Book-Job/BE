@@ -7,11 +7,11 @@ import lombok.Getter;
 public class JobPostingBestResponse {
     private final Long jobPostingId;
     private final String title;
-    private final Integer commentCount;
+    private final Integer viewCount;
 
     public JobPostingBestResponse(JobPosting jobPosting) {
         this.jobPostingId = jobPosting.getId();
         this.title = jobPosting.getTitle();
-        this.commentCount = (jobPosting.getViewCount() != null) ? jobPosting.getViewCount() : 0;
+        this.viewCount = (jobPosting.getViewCount() != null) ? jobPosting.getViewCount() : 0;
     }
 }
