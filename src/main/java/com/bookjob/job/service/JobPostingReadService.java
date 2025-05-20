@@ -41,6 +41,7 @@ public class JobPostingReadService {
         return new CursorJobPostingResponse(response, newCursor);
     }
 
+    @Transactional
     public JobPostingDetailsResponse getJobPostingDetails(Long id) {
         JobPosting jobPosting = jobPostingRepository.findByIdAndDeletedAtIsNull(id)
                 .orElseThrow(NotFoundException::jobPostingNotFound);
