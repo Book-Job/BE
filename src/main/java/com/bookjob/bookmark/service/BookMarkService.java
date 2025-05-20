@@ -97,7 +97,7 @@ public class BookMarkService {
         return new MyBookMarksListResponse(responses);
     }
 
-    @MemberDataCleanup
+    @MemberDataCleanup(order = 1)
     public void deleteBookmark(Long memberId) {
         bookMarkRepository.deleteAllByMemberId(memberId);
     }

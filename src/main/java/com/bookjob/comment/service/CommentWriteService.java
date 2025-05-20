@@ -57,7 +57,7 @@ public class CommentWriteService {
         comment.delete();
     }
 
-    @MemberDataCleanup
+    @MemberDataCleanup(order = 2)
     public void deleteComment(Long memberId) {
         commentRepository.deleteAllByMemberId(memberId);
     }

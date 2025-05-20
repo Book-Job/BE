@@ -5,6 +5,7 @@ import com.bookjob.member.domain.Member;
 import com.bookjob.member.dto.response.MemberDetailResponse;
 import com.bookjob.member.dto.response.MyPageResponse;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
@@ -14,8 +15,6 @@ public interface MemberRepository extends JpaRepository<Member, Long> {
     boolean existsByEmail(String toEmail);
 
     Optional<Member> findByIdAndIsBlockedFalseAndDeletedAtIsNull(Long id);
-
-    Optional<Member> findByLoginId(String loginId);
 
     boolean existsByLoginId(String loginId);
 
@@ -49,4 +48,21 @@ public interface MemberRepository extends JpaRepository<Member, Long> {
 
     @Query("SELECT m.password FROM Member m WHERE m.id = :id AND m.deletedAt IS NULL")
     Optional<Password> findPasswordById(@Param("id") Long id);
+
+    Optional<Member> findByEmail(@Param("email") String email);
+
+    @Query("""
+            select m
+            from Member m
+            where m.loginId = :loginId
+            and m.deletedAt is null
+            """)
+    Optional<Member> findByLoginIdNotDeleted(@Param("loginId")String loginId);
+
+    Optional<Member> findByLoginIdAndDeletedAtIsNotNull(@Param("loginId") String loginId);
+
+    @Modifying
+    @Query("DELETE FROM Member m WHERE m.loginId = :loginId AND m.deletedAt IS NOT NULL")
+    void hardDeleteByLoginId(@Param("loginId") String loginId);
+
 }

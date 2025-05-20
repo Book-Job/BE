@@ -22,9 +22,9 @@ public class JobSeekingFacade {
         jobSeekingWriteService.createJobSeeking(request, member);
     }
 
-    public CursorJobSeekingResponse getJobSeekings(String order, Long cursor, int pageSize) {
+    public CursorJobSeekingResponse getJobSeekings(String order, Long cursor, String keyword, int pageSize) {
         JobSeekingOrder jobSeekingOrder = JobSeekingOrder.fromString(order);
-        return jobSeekingReadService.getJobSeekings(jobSeekingOrder, cursor, pageSize);
+        return jobSeekingReadService.getJobSeekings(jobSeekingOrder, cursor, keyword, pageSize);
     }
 
     public JobSeekingDetailsResponse getJobSeekingDetails(Long id) {

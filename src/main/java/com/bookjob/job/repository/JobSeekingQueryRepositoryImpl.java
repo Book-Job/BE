@@ -20,12 +20,12 @@ public class JobSeekingQueryRepositoryImpl implements JobSeekingQueryRepository 
     private final DSLContext dslContext;
 
     @Override
-    public List<JobSeekingPreviewResponse> getJobSeekingsOrderedBy(Long cursor, String jobCategory, int size) {
+    public List<JobSeekingPreviewResponse> getJobSeekingsOrderedBy(Long cursor, String jobCategory, String keyword, int size) {
         JobSeeking js = JobSeeking.JOB_SEEKING;
 
-        Condition condition = DSL.noCondition();
+        Condition condition = js.DELETED_AT.isNull();
 
-        // 1. jobCategory 필터 적용
+        // 1. jobCategory && keyword 필터 적용
         if (jobCategory != null) {
             try {
                 JobSeekingJobCategory categoryEnum = JobSeekingJobCategory.valueOf(jobCategory);
@@ -34,6 +34,12 @@ public class JobSeekingQueryRepositoryImpl implements JobSeekingQueryRepository 
                 // 유효하지 않은 enum 문자열이 들어올 경우 빈 결과 반환
                 return List.of();
             }
+        }
+
+        if (keyword != null && !keyword.trim().isEmpty()) {
+            Condition keywordCondition = js.TITLE.likeIgnoreCase("%" + keyword + "%")
+                    .or(js.TEXT.likeIgnoreCase("%" + keyword + "%"));
+            condition = condition.and(keywordCondition);
         }
 
         // 2. 커서 조건 적용

@@ -86,4 +86,8 @@ public class MemberReadService {
                 .orElseThrow(NotFoundException::memberNotFound);
         return savedPassword.matches(request.password(), passwordEncoder);
     }
+
+    public Member getMemberByEmail(String email) {
+        return memberRepository.findByEmail(email).orElseThrow(NotFoundException::memberNotFound);
+    }
 }

@@ -2,6 +2,7 @@ package com.bookjob.auth.service;
 
 import com.bookjob.auth.domain.entity.TemporaryToken;
 import com.bookjob.auth.domain.repository.TemporaryTokenRepository;
+import com.bookjob.common.exception.BadRequestException;
 import com.bookjob.common.exception.ConflictException;
 import com.bookjob.common.exception.NotFoundException;
 import com.bookjob.email.dto.EmailVerificationRequest;
@@ -51,7 +52,8 @@ public class AuthService {
         return resetToken;
     }
 
-    public boolean checkResetToken(String email, String resetToken) {
-        return temporaryTokenRepository.existsByTokenAndEmail(resetToken, email);
+    public String checkResetToken(String resetToken) {
+        TemporaryToken temporaryToken =  temporaryTokenRepository.findByToken(resetToken).orElseThrow(BadRequestException::invalidResetToken);
+        return temporaryToken.getEmail();
     }
 }

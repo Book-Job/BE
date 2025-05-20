@@ -71,7 +71,7 @@ public class JobSeekingWriteService {
         jobSeeking.softDelete();
     }
 
-    @MemberDataCleanup
+    @MemberDataCleanup(order = 4)
     public void deleteJobSeeking(Long memberId) {
         jobSeekingRepository.deleteAllByMemberId(memberId);
     }

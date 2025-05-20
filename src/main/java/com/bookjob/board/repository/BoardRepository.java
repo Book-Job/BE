@@ -30,4 +30,6 @@ public interface BoardRepository extends JpaRepository<Board, Long> {
             AND b.deletedAt is null
             """)
     Page<Board> findRecentPosts(@Param("since") LocalDateTime since, Pageable pageable);
+
+    void deleteAllByMemberId(Long memberId);
 }
