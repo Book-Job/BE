@@ -20,6 +20,7 @@ public class JobSeekingReadService {
 
     private final JobSeekingRepository jobSeekingRepository;
 
+    @Transactional(readOnly = true)
     public CursorJobSeekingResponse getJobSeekings(JobSeekingOrder order, Long cursor, String keyword, int pageSize) {
         String jobCategory = extractCategoryFromOrder(order); // null이면 전체
         List<JobSeekingPreviewResponse> jobSeekings = jobSeekingRepository
