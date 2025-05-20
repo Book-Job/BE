@@ -6,6 +6,7 @@ import com.bookjob.board.dto.request.BoardUpdateRequest;
 import com.bookjob.board.repository.BoardRepository;
 import com.bookjob.common.exception.ForbiddenException;
 import com.bookjob.common.exception.NotFoundException;
+import com.bookjob.member.annotation.MemberDataCleanup;
 import com.bookjob.member.domain.Member;
 import com.bookjob.member.dto.request.BoardIdsRequest;
 import jakarta.transaction.Transactional;
@@ -73,5 +74,10 @@ public class BoardWriteService {
                 .orElseThrow(() -> NotFoundException.boardNotFound(boardId));
 
         board.decreaseCommentCount();
+    }
+
+    @MemberDataCleanup(order = 5)
+    public void deleteAllByMemberId(Long memberId) {
+        boardRepository.deleteAllByMemberId(memberId);
     }
 }

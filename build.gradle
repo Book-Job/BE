@@ -72,7 +72,7 @@ jooq {
                     driver = 'com.mysql.cj.jdbc.Driver'
                     url = System.getenv('DB_URL') != null ? System.getenv('DB_URL') + '/' + System.getenv('DB_NAME') : 'jdbc:mysql://localhost:3306/bookjob'
                     user = System.getenv('DB_USER') ?: 'root'
-                    password = System.getenv('DB_PASSWORD') ?: 'root1234'
+                    password = System.getenv('DB_PASSWORD') ?: 'root'
                 }
 
                 generator {

@@ -21,6 +21,9 @@ public class MemberWriteService {
     private final PasswordEncoder passwordEncoder;
 
     public void registerMember(MemberSignupRequest request) {
+        // 동일 loginId로 soft-deleted 계정이 존재하면 하드 딜리트
+        memberRepository.findByLoginIdAndDeletedAtIsNotNull(request.loginId())
+                .ifPresent(member -> memberRepository.hardDeleteByLoginId(request.loginId()));
 
         Member member = Member.builder()
                 .loginId(request.loginId())
